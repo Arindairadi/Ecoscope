@@ -112,6 +112,8 @@ components:
         baseline_start: {type: integer, minimum: 1979, maximum: 2100}
         baseline_end: {type: integer, minimum: 1979, maximum: 2100}
         question: {type: string, maxLength: 500}
+        language: {type: string, enum: [en, fr, sw, lg]}
+        use_ai: {type: boolean}
     ResearchValue:
       type: object
       required: [period, value, uncertainty]

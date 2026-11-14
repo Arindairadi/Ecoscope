@@ -31,6 +31,7 @@ export * from './region';
 export * from './researchDataset';
 export * from './researchDatasetFrequency';
 export * from './researchInput';
+export * from './researchInputLanguage';
 export * from './researchResult';
 export * from './researchSelection';
 export * from './researchSelectionIndicator';

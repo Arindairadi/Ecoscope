@@ -10,6 +10,7 @@ from backend.catalog import INDICATORS, REGIONS, SOURCES
 from backend.models import Foundation, HealthStatus, Indicator, PowerSeries, Region, Series
 from backend.services.power import PowerError, monthly_temperature
 from backend.research_routes import router as research_router
+from backend.places import router as places_router
 
 app = FastAPI(
     title="Ecoscope API",
@@ -20,6 +21,7 @@ app = FastAPI(
     openapi_url="/api/openapi.json",
 )
 app.include_router(research_router)
+app.include_router(places_router)
 
 
 @app.get("/api/healthz", response_model=HealthStatus, operation_id="healthCheck")

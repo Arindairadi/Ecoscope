@@ -88,6 +88,29 @@ Installation requirements and startup instructions depend on the application's t
 
 **Important:** Never commit passwords, API keys, environment secrets, or private credentials to the repository.
 
+##  What works today
+
+- **Places:** pick any of ~230 countries, and a first-level region or district, from a built-in list (Natural Earth boundaries, simplified). Analysis runs at a point inside the chosen place, not as a regional average.
+- **Indicators:** air temperature, precipitation, humidity and wind (NASA POWER, monthly, modelled), global CO2 (NOAA), national forest area (World Bank/FAO), and a 3-month drought index (SPI-3) computed from precipitation. Recent satellite fire detections (NASA FIRMS) are on the Explorer page.
+- **Analysis:** linear and Sen trend, Mann-Kendall, change-point screen, anomaly screening, and two-place comparison, each with its caveats.
+- **PDF reports:** a downloadable report with results, a chart, methods and caveats, and full data provenance. Headings are available in English, French, Swahili and Luganda.
+- **Plain-language explanations:** rule-based by default. Optionally an AI model can rewrite the computed results in plain language (see Configuration); answers that contain a number not found in the results are discarded.
+
+##  Configuration
+
+All settings are optional environment variables on the server (never in browser code):
+
+| Variable | Purpose |
+|---|---|
+| `FIRMS_MAP_KEY` | Free NASA FIRMS key for the VIIRS fire layer |
+| `ANTHROPIC_API_KEY` | Turns on the optional AI plain-language explanations (usage is billed to that key) |
+| `ANTHROPIC_MODEL` | Model for those explanations (default `claude-haiku-5-5`) |
+| `AI_EXPLAIN_PER_HOUR`, `AI_EXPLAIN_PER_DAY` | Usage caps per visitor and overall (defaults 10 and 300) |
+
+##  Still to do
+
+Accounts and saved analyses (Supabase), vegetation (NDVI) and tree-cover-loss indicators, a fully translated interface, and more mobile polish.
+
 ##  Future Roadmap
 
 - [ ] Expand environmental data integrations.

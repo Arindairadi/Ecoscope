@@ -21,6 +21,8 @@ class ResearchInput(StrictModel):
     baseline_start: int = Field(default=1991, ge=1979, le=2100)
     baseline_end: int = Field(default=2020, ge=1979, le=2100)
     question: str = Field(default="", max_length=500)
+    language: Literal["en", "fr", "sw", "lg"] = "en"
+    use_ai: bool = False
 
 
 class ResearchValue(StrictModel):

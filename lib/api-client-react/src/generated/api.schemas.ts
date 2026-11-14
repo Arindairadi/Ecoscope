@@ -238,6 +238,16 @@ export interface ResearchSelection {
   end: string;
 }
 
+export type ResearchInputLanguage = typeof ResearchInputLanguage[keyof typeof ResearchInputLanguage];
+
+
+export const ResearchInputLanguage = {
+  en: 'en',
+  fr: 'fr',
+  sw: 'sw',
+  lg: 'lg',
+} as const;
+
 export interface ResearchInput {
   selection: ResearchSelection;
   comparison?: ResearchSelection | null;
@@ -253,6 +263,8 @@ export interface ResearchInput {
   baseline_end: number;
   /** @maxLength 500 */
   question?: string;
+  language?: ResearchInputLanguage;
+  use_ai?: boolean;
 }
 
 export interface ResearchValue {

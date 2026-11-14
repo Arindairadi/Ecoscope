@@ -5,6 +5,7 @@ import { Download, FileJson, FileText, Map as MapIcon, MessageSquareText, Play, 
 import { useRunResearch, type AnalysisResult, type MethodResult, type ResearchDataset, type ResearchInput, type ResearchResult, type ResearchSelection } from "@workspace/api-client-react";
 import { ErrorPanel, Panel, StatusTag } from "@/components/status";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PlacePicker, useCountries } from "@/components/place-picker";
 import { cn } from "@/lib/utils";
 import { MAX_SAVED, loadSelections, newId, parseImported, persistSelections, type SavedSelection } from "@/lib/research-store";
 import { bundleJson, datasetCsv, datasetJson, downloadBlob, printHtml, reportHtml, safeUrl, serializeSvg } from "@/lib/research-export";
@@ -98,6 +99,9 @@ export default function Research() {
   const [result, setResult] = useState<ResearchResult | null>(null);
   const [answer, setAnswer] = useState<{ q: string; r: ResearchResult } | null>(null);
   const [question, setQuestion] = useState("");
+  const [aiOn, setAiOn] = useState(false);
+  const [lang, setLang] = useState<"en" | "fr" | "sw" | "lg">("en");
+  const [pdfBusy, setPdfBusy] = useState(false);
   const [runError, setRunError] = useState<unknown>(null);
   const [askError, setAskError] = useState<unknown>(null);
   const [view, setView] = useState<View>("raw");
@@ -127,9 +131,23 @@ export default function Research() {
     const id = ++askId.current; const base = reqId.current; const q = question.trim().slice(0, 500);
     setAskError(null); setAnswer(null);
     try {
-      const r = await askRef.current({ data: { ...applied, question: q } });
+      const r = await askRef.current({ data: { ...applied, question: q, language: lang, use_ai: aiOn } });
       if (id === askId.current && base === reqId.current) setAnswer({ q, r });
     } catch (e) { if (id === askId.current) setAskError(e); }
+  };
+
+  const downloadPdf = async () => {
+    if (!applied || pdfBusy) return;
+    setPdfBusy(true); setNotice(null);
+    try {
+      const res = await fetch(`/api/research/report?language=${lang}`, { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...applied, question: answer?.q ?? "", language: lang, use_ai: !!answer && aiOn }) });
+      if (!res.ok) throw new Error(`The report could not be created (${res.status}). Try again in a moment.`);
+      const url = URL.createObjectURL(await res.blob());
+      const a = document.createElement("a"); a.href = url; a.download = `ecoscope-report_${slug}.pdf`;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1500);
+    } catch (e) { setNotice(e instanceof Error ? e.message : "The report could not be created."); }
+    finally { setPdfBusy(false); }
   };
 
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => ({ ...d, [k]: v }));
@@ -202,6 +220,8 @@ export default function Research() {
 
               {draft.source === "power" && (
                 <div className="space-y-2">
+                  <PlacePicker iso={draft.country} fieldClass={field} labelClass={lbl}
+                    onPick={(pk) => setDraft((d) => ({ ...d, country: pk.iso3, lat: String(pk.latitude), lng: String(pk.longitude) }))} />
                   <div><label className={lbl} htmlFor="r-preset">Point preset</label>
                     <select id="r-preset" data-testid="select-research-preset" className={field} value={POINTS.find((p) => String(p.lat) === draft.lat && String(p.lng) === draft.lng)?.id ?? "custom"}
                       onChange={(e) => { const p = POINTS.find((x) => x.id === e.target.value); if (p) setDraft((d) => ({ ...d, lat: String(p.lat), lng: String(p.lng) })); }}>
@@ -291,6 +311,7 @@ export default function Research() {
                     <button data-testid="button-export-json" className={btn} onClick={() => downloadBlob(datasetJson(r.dataset), `ecoscope_${slug}.json`, "application/json")}><FileJson className="h-3 w-3" /> JSON</button>
                     <button data-testid="button-export-chart" className={btn} onClick={exportChart}><Download className="h-3 w-3" /> SVG</button>
                     <button data-testid="button-export-bundle" className={btn} onClick={() => downloadBlob(bundleJson(applied, fullResult as ResearchResult), `ecoscope-bundle_${slug}.json`, "application/json")}><FileJson className="h-3 w-3" /> Bundle</button>
+                    <button data-testid="button-export-pdf" className={btn} disabled={pdfBusy} onClick={() => void downloadPdf()}><FileText className="h-3 w-3" /> {pdfBusy ? "Making PDF…" : "PDF report"}</button>
                     <button data-testid="button-export-report" className={btn} onClick={() => downloadBlob(reportHtml(applied, fullResult as ResearchResult), `ecoscope-report_${slug}.html`, "text/html")}><FileText className="h-3 w-3" /> Report</button>
                     <button data-testid="button-print-report" className={btn} onClick={() => { if (!printHtml(reportHtml(applied, fullResult as ResearchResult))) setNotice("Pop-up blocked. Download the report and print it instead."); }}><Printer className="h-3 w-3" /> Print</button>
                   </div>
@@ -303,14 +324,21 @@ export default function Research() {
                 </Panel>
                 <MethodsPanel a={r.analysis} />
                 {r.comparison && r.comparison_dataset && <ComparisonPanel r={r} />}
-                <Panel label="Evidence Q&A" right={<span data-testid="text-explanation-mode" className="font-mono text-[10px] uppercase text-muted-foreground">deterministic · rule-based</span>}>
+                <Panel label="Evidence Q&A" right={<span data-testid="text-explanation-mode" className="font-mono text-[10px] uppercase text-muted-foreground">{aiOn ? "AI · numbers verified" : "deterministic · rule-based"}</span>}>
                   <form className="space-y-2" onSubmit={(e) => { e.preventDefault(); void doAsk(); }}>
                     <label className={lbl} htmlFor="r-q">Question about the applied selection</label>
                     <div className="flex flex-col gap-2 sm:flex-row">
                       <input id="r-q" data-testid="input-research-question" maxLength={500} className={field} placeholder="Is there a statistically supported warming trend?" value={question} onChange={(e) => setQuestion(e.target.value)} />
                       <button type="submit" data-testid="button-ask-research" disabled={!question.trim() || ask.isPending} className={cn(btn, "bg-primary text-primary-foreground hover:opacity-90")}><MessageSquareText className="h-3.5 w-3.5" /> {ask.isPending ? "Answering..." : "Ask"}</button>
                     </div>
-                    <p className="text-[11px] text-muted-foreground">Answered by server-side rules over the same applied selection and baseline. No generative AI; it can only restate computed results.</p>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <label className="flex items-center gap-1.5 text-[11px]"><input data-testid="checkbox-use-ai" type="checkbox" checked={aiOn} onChange={(e) => setAiOn(e.target.checked)} /> Plain-language AI explanation</label>
+                      <label className="flex items-center gap-1.5 text-[11px]">Answer and PDF language
+                        <select data-testid="select-language" className={cn(field, "w-auto py-1")} value={lang} onChange={(e) => setLang(e.target.value as typeof lang)}>
+                          <option value="en">English</option><option value="fr">Français</option><option value="sw">Kiswahili</option><option value="lg">Luganda</option>
+                        </select></label>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">{aiOn ? "An AI model rewrites the computed results in plain language. It sees only those results, and any answer containing a number that is not in them is discarded in favour of the rule-based one. Only the PDF's headings are translated; Luganda and Swahili text should be checked by a fluent speaker." : "Answered by server-side rules over the same applied selection and baseline; it can only restate computed results."}</p>
                   </form>
                   {ask.isPending && <Skeleton className="mt-3 h-16" />}
                   {!!askError && !ask.isPending && <div className="mt-3"><ErrorPanel title="Question could not be answered" error={askError} onRetry={() => void doAsk()} /></div>}
@@ -331,12 +359,14 @@ export default function Research() {
 }
 
 function CountryField({ id, testid, value, onChange, label }: { id: string; testid: string; value: string; onChange: (v: string) => void; label: string }) {
+  const { countries } = useCountries();
+  const options = countries ? countries.map((c) => ({ iso: c.iso3, label: c.name })) : COUNTRIES;
   return (
     <div>
       <label className={lbl} htmlFor={id}>{label}</label>
       <div className="flex gap-2">
-        <select aria-label={`${label} preset`} data-testid={`${testid}-preset`} className={field} value={COUNTRIES.some((c) => c.iso === value) ? value : ""} onChange={(e) => e.target.value && onChange(e.target.value)}>
-          {COUNTRIES.map((c) => <option key={c.iso} value={c.iso}>{c.label} ({c.iso})</option>)}<option value="">Custom ISO3</option>
+        <select aria-label={`${label} preset`} data-testid={`${testid}-preset`} className={field} value={options.some((c) => c.iso === value) ? value : ""} onChange={(e) => e.target.value && onChange(e.target.value)}>
+          {options.map((c) => <option key={c.iso} value={c.iso}>{c.label} ({c.iso})</option>)}<option value="">Custom ISO3</option>
         </select>
         <input id={id} data-testid={testid} maxLength={3} className={cn(field, "w-20 font-mono uppercase")} value={value} onChange={(e) => onChange(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))} />
       </div>

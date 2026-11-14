@@ -5,6 +5,7 @@
  * Ecoscope foundation and NASA POWER monthly point temperature.
  * OpenAPI spec version: 0.1.0
  */
+import type { ResearchInputLanguage } from './researchInputLanguage';
 import type { ResearchSelection } from './researchSelection';
 
 export interface ResearchInput {
@@ -22,4 +23,6 @@ export interface ResearchInput {
   baseline_end: number;
   /** @maxLength 500 */
   question?: string;
+  language?: ResearchInputLanguage;
+  use_ai?: boolean;
 }

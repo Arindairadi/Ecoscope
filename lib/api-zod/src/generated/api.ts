@@ -127,7 +127,9 @@ export const RunResearchBody = zod.object({
 }),zod.null()]).optional(),
   "baseline_start": zod.number().int().min(runResearchBodyBaselineStartMin).max(runResearchBodyBaselineStartMax),
   "baseline_end": zod.number().int().min(runResearchBodyBaselineEndMin).max(runResearchBodyBaselineEndMax),
-  "question": zod.string().max(runResearchBodyQuestionMax).optional()
+  "question": zod.string().max(runResearchBodyQuestionMax).optional(),
+  "language": zod.enum(['en', 'fr', 'sw', 'lg']).optional(),
+  "use_ai": zod.boolean().optional()
 })
 
 export const runResearchResponseDatasetSelectionLatitudeMin = -90;
