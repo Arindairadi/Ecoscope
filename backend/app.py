@@ -1,7 +1,10 @@
 """Read-only, credential-free Phase 1 REST foundation."""
+import os
 from datetime import date, datetime, timezone
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import FileResponse
 
 from backend.catalog import INDICATORS, REGIONS, SOURCES
 from backend.models import Foundation, HealthStatus, Indicator, PowerSeries, Region, Series
@@ -78,3 +81,22 @@ def series(region: str = Query(max_length=50), indicator: str = Query(max_length
         region=region, indicator=indicator, start=start, end=end, unit=selected.unit,
         observations=[],
     )
+
+
+# --- Optional: serve the built frontend from the same origin ----------------
+# The frontend calls relative /api/... URLs, so in production this service
+# serves both. Active only when the built frontend exists (e.g. in Docker).
+_DIST = Path(os.environ.get(
+    "FRONTEND_DIST",
+    Path(__file__).resolve().parent.parent / "artifacts" / "earthscope" / "dist" / "public",
+)).resolve()
+
+if (_DIST / "index.html").is_file():
+    @app.get("/{full_path:path}", include_in_schema=False)
+    def serve_frontend(full_path: str):
+        if full_path == "api" or full_path.startswith("api/"):
+            raise HTTPException(404, "Not found.")
+        candidate = (_DIST / full_path).resolve()
+        if full_path and candidate.is_file() and _DIST in candidate.parents:
+            return FileResponse(candidate)
+        return FileResponse(_DIST / "index.html")
