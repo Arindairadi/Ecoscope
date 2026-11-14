@@ -1,13 +1,13 @@
-# EARTHSCOPE — Earth System Trend Detective
+# Ecoscope — Earth System Trend Detective
 
 See the Planet. Detect the Trends. Understand the Change.
 
 ## Scope and scientific integrity
 - Build incrementally. Phase 1 is the connected environment foundation, not a finished platform.
 - Never fabricate environmental measurements, statistics, charts, successful connections, tests or causal claims.
-- Scientific data, Supabase/PostGIS, trend engine, explanations and reports remain pending.
+- NASA POWER monthly T2M point retrieval is the only implemented scientific adapter. Other sources, Supabase/PostGIS, trends, explanations and reports remain pending.
 - User prefers free external services. Do not upgrade, buy add-ons or provision optional paid services.
-- Keep all credentials server-side. No credentials are needed for Phase 1.
+- Keep all credentials server-side. Foundation and NASA POWER point retrieval require no credentials.
 
 ## Run and check
 - Managed `artifacts/api-server: API Server` workflow invokes `pnpm --filter @workspace/api-server run dev`, which starts Python FastAPI via `backend.run`.
@@ -18,6 +18,7 @@ See the Planet. Detect the Trends. Understand the Change.
 - `pnpm run typecheck`
 - `pnpm --filter @workspace/api-spec run codegen` after each contract change.
 - API docs `/api/docs`; health `/api/healthz`.
+- NASA contract `/api/power/monthly`; see `docs/NASA_POWER.md` for verified official metadata, bounds, caching, provenance and caveats.
 - No database required. Unused Express/Drizzle scaffold is not the running backend.
 
 ## Code and team

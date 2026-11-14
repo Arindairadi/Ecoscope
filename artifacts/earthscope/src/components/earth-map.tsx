@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 
 export type View = { lat: number; lng: number; zoom: number; key: string };
 export type Pt = { lat: number; lng: number };
+export const wrapLng = (lng: number) => { const w = ((((lng + 180) % 360) + 360) % 360) - 180; return w === -180 && lng > 0 ? 180 : w; };
 
 function Fly({ view }: { view: View }) {
   const map = useMap();
@@ -15,7 +16,7 @@ function Fly({ view }: { view: View }) {
 }
 function Picker({ on, onPick, onMove }: { on: boolean; onPick: (p: Pt) => void; onMove: (p: Pt | null) => void }) {
   useMapEvents({
-    click: (e) => on && onPick({ lat: e.latlng.lat, lng: e.latlng.lng }),
+    click: (e) => { if (on) onPick({ lat: Math.max(-90, Math.min(90, e.latlng.lat)), lng: wrapLng(e.latlng.lng) }); },
     mousemove: (e) => onMove({ lat: e.latlng.lat, lng: e.latlng.lng }),
     mouseout: () => onMove(null),
   });
@@ -30,7 +31,7 @@ export function EarthMap({ view, point, onPoint }: { view: View; point: Pt | nul
 
   return (
     <div className="relative h-full min-h-[360px] overflow-hidden rounded-md border grid-paper">
-      <MapContainer center={[view.lat, view.lng]} zoom={view.zoom} minZoom={2} worldCopyJump zoomControl={false} className={cn("h-full w-full", picking && "cursor-crosshair")} style={{ background: "transparent" }}>
+      <MapContainer center={[view.lat, view.lng]} zoom={view.zoom} minZoom={2} worldCopyJump maxBounds={[[-90, -540], [90, 540]]} maxBoundsViscosity={1} zoomControl={false} className={cn("h-full w-full", picking && "cursor-crosshair")} style={{ background: "transparent" }}>
         <ZoomControl position="bottomright" />
         {basemap && (
           <TileLayer
@@ -75,7 +76,7 @@ export function EarthMap({ view, point, onPoint }: { view: View; point: Pt | nul
       </div>
 
       <div className="pointer-events-none absolute bottom-6 left-2 right-12 z-[500] w-fit max-w-[calc(100%-4rem)] rounded-sm border bg-card/95 px-2 py-1 font-mono text-[10px] text-muted-foreground shadow-sm">
-        {cursor ? `${cursor.lat.toFixed(3)}, ${cursor.lng.toFixed(3)}` : "lat, lon"} · Basemap is context only, not environmental evidence
+        {cursor ? `${cursor.lat.toFixed(3)}, ${wrapLng(cursor.lng).toFixed(3)}` : "lat, lon"} · Basemap is context only, not environmental evidence
       </div>
     </div>
   );

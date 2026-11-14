@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { Activity, Database, Map as MapIcon, Menu, Moon, Route as RouteIcon, Sun, X } from "lucide-react";
 import { getHealthCheckQueryKey, useHealthCheck } from "@workspace/api-client-react";
@@ -42,17 +42,23 @@ function Health() {
 export function Shell({ children }: { children: ReactNode }) {
   const [loc] = useLocation();
   const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    const close = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); };
+    window.addEventListener("keydown", close);
+    return () => window.removeEventListener("keydown", close);
+  }, [open]);
   const { theme, toggle } = useTheme();
   const side = (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-2.5 px-4 py-4">
         <Mark />
         <div>
-          <div className="font-mono text-sm font-medium tracking-[0.22em]">EARTHSCOPE</div>
+          <div className="font-mono text-sm font-medium tracking-[0.22em]">Ecoscope</div>
           <div className="text-[10px] text-sidebar-foreground/55">Earth System Trend Detective</div>
         </div>
       </div>
-      <div className="mx-4 mb-3 rounded-sm border border-sidebar-primary/40 bg-sidebar-primary/10 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-sidebar-primary">Phase 1 · Foundation</div>
+      <div className="mx-4 mb-3 rounded-sm border border-sidebar-primary/40 bg-sidebar-primary/10 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-sidebar-primary">Phase 2 · NASA POWER point data</div>
       <nav className="flex flex-col gap-0.5 px-2">
         {NAV.map((n) => {
           const active = loc === n.href;
@@ -79,13 +85,16 @@ export function Shell({ children }: { children: ReactNode }) {
       {open && (
         <div className="fixed inset-0 z-[1000] md:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
-          <div className="absolute inset-y-0 left-0 w-64">{side}</div>
+          <div className="absolute inset-y-0 left-0 w-64" role="dialog" aria-modal="true" aria-label="Navigation">
+            <button data-testid="button-close-menu" aria-label="Close navigation" onClick={() => setOpen(false)} className="absolute right-1 top-1 z-10 rounded-sm bg-sidebar p-1 text-sidebar-foreground"><X className="h-4 w-4" /></button>
+            {side}
+          </div>
         </div>
       )}
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="sticky top-0 z-[900] flex items-center justify-between border-b bg-sidebar px-3 py-2 text-sidebar-foreground md:hidden">
-          <div className="flex items-center gap-2"><Mark /><span className="font-mono text-xs tracking-[0.2em]">EARTHSCOPE</span></div>
-          <button data-testid="button-menu" onClick={() => setOpen((o) => !o)} className="rounded-sm p-1.5 hover:bg-sidebar-accent">{open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button>
+          <div className="flex items-center gap-2"><Mark /><span className="font-mono text-xs tracking-[0.2em]">Ecoscope</span></div>
+          <button data-testid="button-menu" aria-label="Open navigation" aria-expanded={open} onClick={() => setOpen((o) => !o)} className="rounded-sm p-1.5 hover:bg-sidebar-accent">{open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button>
         </div>
         <main className="flex-1">{children}</main>
       </div>

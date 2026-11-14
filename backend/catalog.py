@@ -12,7 +12,7 @@ REGIONS = [
 
 INDICATORS = [
     Indicator(id="temperature", name="Air temperature", unit="°C", category="Climate",
-              status="not_connected", description="Planned near-surface air temperature. Dataset and temporal aggregation pending."),
+              status="adapter_available", description="NASA POWER monthly T2M point/grid MERRA-2 modelled estimates, not station observations or national averages."),
     Indicator(id="precipitation", name="Precipitation", unit="mm/day", category="Climate",
               status="not_connected", description="Planned daily precipitation; source-specific units must be validated."),
     Indicator(id="vegetation", name="Vegetation index", unit="unitless", category="Biosphere",
@@ -22,8 +22,8 @@ INDICATORS = [
 ]
 
 SOURCES = [
-    Integration(id="nasa-power", name="NASA POWER", status="not_connected",
-                detail="Phase 2 priority: investigate no-key access, parameters, units, limits and attribution before connecting.",
+    Integration(id="nasa-power", name="NASA POWER", status="adapter_available",
+                detail="Monthly T2M point-query adapter available without a key. MERRA-2 reanalysis/modelled estimates in °C. Individual requests may fail; successful retrieval is shown with its timestamp. CC BY 4.0; NASA POWER attribution retained.",
                 url="https://power.larc.nasa.gov/docs/services/api/"),
     Integration(id="earthdata", name="NASA Earthdata / FIRMS", status="not_connected",
                 detail="Pending product-specific Earthdata authentication, FIRMS key and licensing review.",

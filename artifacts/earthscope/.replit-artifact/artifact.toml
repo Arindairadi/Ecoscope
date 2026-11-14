@@ -1,6 +1,6 @@
 kind = "web"
 previewPath = "/"
-title = "EARTHSCOPE"
+title = "Ecoscope"
 description = "Earth System Trend Detective — a scientific environmental analysis foundation with real FastAPI connectivity and honest integration states."
 version = "1.0.0"
 id = "artifacts/earthscope"

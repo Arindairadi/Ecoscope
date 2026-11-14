@@ -6,13 +6,15 @@ Deliverables: runnable React/FastAPI services; responsive dark/light dashboard; 
 
 Actual acceptance evidence is recorded separately in `VERIFICATION.md`. A UI badge is not proof of test completion. No scientific data is connected in this phase.
 
-## Phase 2 — Authentic sources, incrementally (pending)
+## Phase 2 — Authentic sources, incrementally (first increment implemented)
 
-Investigate NASA POWER first as a **candidate no-key** source, then choose the smallest reliable vertical slice (one indicator, one geographic/time request). No automatic integrations until the foundation passes its checks. Research official documentation and verify current authentication, API limits, costs, licensing and attribution before every source is enabled.
+NASA POWER monthly T2M point/grid retrieval is implemented in this increment. Official access, metadata, licensing/attribution and resolution findings are in `NASA_POWER.md`. Browser interactions were exercised before integration; final parser/API/browser/build results are recorded in the latest `VERIFICATION.md` section. This does not complete Phase 2 as a whole: all other sources and database persistence remain pending.
+
+The first no-key NASA POWER T2M vertical slice has passed the checks recorded in `VERIFICATION.md`. For every additional source, research official documentation and verify current authentication, API limits, costs, licensing and attribution before enabling it.
 
 | Source | Investigation gate |
 |---|---|
-| NASA POWER | No-key availability, supported parameter/community, native units, modelled/reanalysis provenance, temporal coverage, limits, acknowledgment |
+| NASA POWER | **T2M monthly point slice verified**; any additional parameter/product still needs its own review |
 | NASA Earthdata / FIRMS | Earthdata product access versus FIRMS map/API keys, thermal anomaly interpretation, latency, licensing |
 | NOAA | Specific endpoint/product, token requirements, units, station coverage, quality flags and limits |
 | Copernicus | Specific product and platform, registration/auth, quotas, license, resolution and processing |
@@ -21,7 +23,7 @@ Investigate NASA POWER first as a **candidate no-key** source, then choose the s
 | OpenStreetMap | Existing context-only basemap; ODbL attribution and public tile usage policy, availability and scale suitability |
 | Earth Engine | Project registration/authorization, eligibility, quotas, current commercial/noncommercial terms and dataset licenses |
 
-All entries above are **research gates, not verified connection claims**. Basemap usage does not connect OSM as a scientific measurement source.
+Except for the explicitly verified NASA POWER T2M slice, entries above are **research gates, not verified connection claims**. Basemap usage does not connect OSM as a scientific measurement source.
 
 Integration acceptance requires real request fixtures or reproducible bounded retrieval, source URL/product/version, retrieval and observation timestamps, units and conversions, quality flags, spatial definition, missing-data behavior, honest error handling and tests. Do not turn nulls into zero. Separate observations, modelled estimates, forecasts and clearly labeled demonstration data in API and UI.
 

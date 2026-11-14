@@ -2,10 +2,28 @@ openapi: 3.1.0
 info:
   title: Api
   version: 0.1.0
-  description: EARTHSCOPE Phase 1 foundation. No scientific observations are connected.
+  description: Ecoscope foundation and NASA POWER monthly point temperature.
 servers:
   - url: /api
 paths:
+  /power/monthly:
+    get:
+      operationId: getPowerMonthly
+      parameters:
+        - { name: latitude, in: query, required: true, schema: { type: number, minimum: -90, maximum: 90 } }
+        - { name: longitude, in: query, required: true, schema: { type: number, minimum: -180, maximum: 180 } }
+        - { name: start, in: query, required: true, schema: { type: string, pattern: '^\d{4}-(0[1-9]|1[0-2])$' } }
+        - { name: end, in: query, required: true, schema: { type: string, pattern: '^\d{4}-(0[1-9]|1[0-2])$' } }
+      responses:
+        "200":
+          description: Real retrieved monthly point/grid estimates or explicit no-data result
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PowerSeries" }
+        "422": { description: Invalid coordinates or month range }
+        "502": { description: Invalid or failed upstream response }
+        "503": { description: Upstream busy or rate limited }
+        "504": { description: Upstream timeout }
   /healthz:
     get:
       operationId: healthCheck
@@ -60,6 +78,45 @@ paths:
           description: Invalid selection
 components:
   schemas:
+    MonthlyValue:
+      type: object
+      required: [month, value]
+      properties:
+        month: { type: string }
+        value: { type: ["number", "null"] }
+    PowerSeries:
+      type: object
+      required: [status, message, latitude, longitude, requested_start, requested_end, available_start, available_end, unit, parameter, parameter_name, kind, source, source_url, documentation_url, retrieved_at, source_version, source_time_standard, spatial_caveat, attribution, license, expected_months, valid_months, missing_months, completeness_percent, mean, minimum, maximum, values]
+      properties:
+        status: { type: string, enum: [ok, no_data] }
+        message: { type: string }
+        latitude: { type: number }
+        longitude: { type: number }
+        requested_start: { type: string }
+        requested_end: { type: string }
+        available_start: { type: ["string", "null"] }
+        available_end: { type: ["string", "null"] }
+        unit: { type: string }
+        parameter: { type: string }
+        parameter_name: { type: string }
+        kind: { type: string }
+        source: { type: string }
+        source_url: { type: string }
+        documentation_url: { type: string }
+        retrieved_at: { type: ["string", "null"] }
+        source_version: { type: ["string", "null"] }
+        source_time_standard: { type: ["string", "null"] }
+        spatial_caveat: { type: string }
+        attribution: { type: string }
+        license: { type: string }
+        expected_months: { type: integer }
+        valid_months: { type: integer }
+        missing_months: { type: integer }
+        completeness_percent: { type: number }
+        mean: { type: ["number", "null"] }
+        minimum: { type: ["number", "null"] }
+        maximum: { type: ["number", "null"] }
+        values: { type: array, items: { $ref: "#/components/schemas/MonthlyValue" } }
     HealthStatus:
       type: object
       required: [status, service, timestamp]

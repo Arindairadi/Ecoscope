@@ -2,14 +2,14 @@
 
 ## What exists now
 
-This is one shared Replit codebase. Git was already initialized. At foundation setup, no Git remote or authorized GitHub integration was available. No GitHub repository was created, no account was connected, and no push or invitations were performed.
+This is one shared Replit codebase. Git was already initialized. At foundation setup, no GitHub remote or authorized GitHub integration was available. A later inspection found an internal checkpoint/backup remote, **not a GitHub repository**. No GitHub repository was created, no account was connected, and no GitHub push or invitations were performed.
 
 ## Connect GitHub manually
 
 1. The repository owner signs in to the intended GitHub account.
 2. In the Replit Project Editor, open **Tools → Git**.
 3. Choose **Connect to GitHub** / the GitHub connection action shown. Complete GitHub's authorization dialog with the intended account/organization. Organization approval may also be required.
-4. Choose/create **one** repository, for example `earthscope`. Prefer private while access and licensing are being reviewed. Do not purchase a plan or add-on. If the interface offers only creation, create the repo there; if linking an existing repo, confirm its history before pushing.
+4. Choose/create **one** repository, for example `Ecoscope`. Prefer private while access and licensing are being reviewed. Do not purchase a plan or add-on. If the interface offers only creation, create the repo there; if linking an existing repo, confirm its history before pushing.
 5. Confirm this project is linked to that canonical repository. Review staged files, commit and push through the Git pane. Do not force-push or overwrite an existing unrelated history.
 6. Verify the commit is visible on GitHub. Until that succeeds, GitHub synchronization is **not verified**.
 
@@ -17,7 +17,8 @@ For a manually configured remote, use only the real owner/repository selected ab
 
 ```sh
 git remote -v
-# Only when origin is absent; this is a template, not an executed command:
+# Only when origin is absent; an internal backup remote is not origin.
+# This is a template, not an executed command:
 git remote add origin https://github.com/OWNER/REPOSITORY.git
 git push -u origin HEAD
 ```

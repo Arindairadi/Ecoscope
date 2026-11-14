@@ -1,16 +1,18 @@
-# EARTHSCOPE — Earth System Trend Detective
+# Ecoscope — Earth System Trend Detective
+
+The product is **Ecoscope**, with the tagline “See the Planet. Detect the Trends. Understand the Change.” Existing package names, artifact IDs, directory paths and workflow identifiers are retained for compatibility. The app's Replit artifact display title is Ecoscope. To change the workspace-level project name separately, click the app name in Replit's interface and edit it to **Ecoscope**; this does not require publishing.
 
 **See the Planet. Detect the Trends. Understand the Change.**
 
 ## Current scope
 
-Phase 1 is a runnable scientific application foundation, not a completed environmental analytics platform. The React dashboard calls a real Python FastAPI REST backend. Scientific observations, trend estimates and external database connections are deliberately absent. No credentials are needed to run this phase.
+The React dashboard calls a real Python FastAPI REST backend. The first Phase 2 increment adds **NASA POWER monthly T2M point estimates** with provenance, gaps, summaries and a dataset download. It is not a finished environmental analytics platform: other sources, trend inference and external database connections remain pending. No credentials are needed for the foundation or this NASA POWER adapter.
 
 The OpenStreetMap basemap is geographic context, **not environmental evidence**. Public tiles require internet access, may be unavailable or rate-limited, and carry visible attribution. Country presets are viewport centers, not authoritative boundary polygons. Uganda is included.
 
 ## Start in Replit
 
-Use the configured **API Server** and **EARTHSCOPE web** workflows, then open the EARTHSCOPE preview. The Canvas workflow is unused scaffold and is not needed. One shared project holds the frontend and backend.
+Use the configured **API Server** and **Ecoscope web** workflows, then open the Ecoscope preview. The Canvas workflow is unused scaffold and is not needed. One shared project holds the frontend and backend. Technical package names, paths and workflow identifiers are unchanged.
 
 For a fresh checkout, Python 3.12+ and Node/pnpm are needed:
 
@@ -48,5 +50,6 @@ curl --fail 'http://localhost:80/api/series?region=uganda&indicator=temperature&
 - [Team collaboration and GitHub authorization](docs/COLLABORATION.md)
 - [Publishing runbook](docs/DEPLOYMENT.md)
 - [Verification results](docs/VERIFICATION.md)
+- [NASA POWER source verification and integration semantics](docs/NASA_POWER.md)
 
 No external paid service, plan upgrade, add-on or database was provisioned. A paid Replit subscription does not authorize optional paid services.

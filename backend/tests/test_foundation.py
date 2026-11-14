@@ -16,15 +16,17 @@ PARAMS = {"region": "uganda", "indicator": "temperature", "start": "2015-01-01",
 def test_health_is_live_fastapi():
     response = client.get("/api/healthz")
     assert response.status_code == 200
-    assert response.json()["service"] == "EARTHSCOPE FastAPI"
+    assert response.json()["service"] == "Ecoscope FastAPI"
     assert datetime.fromisoformat(response.json()["timestamp"]).tzinfo is not None
 
 
 def test_honest_foundation():
     data = client.get("/api/foundation").json()
-    assert data["database"] == data["scientificData"] == "not_connected"
+    assert data["database"] == "not_connected"
+    assert data["scientificData"] == "nasa_power_adapter_available"
     assert len(data["sources"]) == 9
-    assert all(s["status"] == "not_connected" for s in data["sources"] if s["id"] != "osm")
+    assert all(s["status"] == "not_connected" for s in data["sources"] if s["id"] not in {"osm", "nasa-power"})
+    assert next(s for s in data["sources"] if s["id"] == "nasa-power")["status"] == "adapter_available"
 
 
 def test_geographic_catalog_has_uganda():
@@ -36,7 +38,7 @@ def test_geographic_catalog_has_uganda():
 def test_indicators_are_planning_metadata():
     data = client.get("/api/indicators").json()
     assert len(data) == 4
-    assert all(i["status"] == "not_connected" for i in data)
+    assert all(i["status"] == "not_connected" for i in data if i["id"] != "temperature")
 
 
 def test_scientific_results_are_empty_and_echo_selection():
@@ -77,7 +79,7 @@ def test_frontend_contract_matches_runtime():
         full_path = f"/api{path}"
         assert full_path in runtime["paths"]
         assert runtime["paths"][full_path]["get"]["operationId"] == entry["get"]["operationId"]
-        if path != "/series":
+        if path not in {"/series", "/power/monthly"}:
             result = client.get(full_path)
             assert result.status_code == 200
             schema = entry["get"]["responses"]["200"]["content"]["application/json"]["schema"]

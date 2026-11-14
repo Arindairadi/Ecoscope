@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 const PHASES = [
   { n: 1, title: "Foundation", body: "API service, region and indicator registries, series contract, map workspace and honest status reporting. Backend tests, TypeScript checks and live frontend/API connectivity verified. External scientific integrations remain pending.", status: "complete" },
-  { n: 2, title: "Scientific sources", body: "Connect authoritative datasets (reanalysis, precipitation, vegetation indices, forest cover) with provenance, retrieval timestamps and point-level retrieval.", status: "pending" },
+  { n: 2, title: "Scientific sources", body: "Partial. Implemented: NASA POWER monthly 2 m air temperature (T2M, MERRA-2 based modelled estimate) at a single selected grid point, with provenance, retrieval timestamp, completeness and JSON export. Not yet connected: precipitation, vegetation indices, forest cover, area averages. Verification of this slice is not claimed here.", status: "partial" },
   { n: 3, title: "Validated trends", body: "Trend estimation with uncertainty, significance testing, seasonality handling and documented validation against reference data.", status: "pending" },
   { n: 4, title: "Grounded explanations", body: "Plain-language interpretation that cites the specific observations and methods behind each statement.", status: "pending" },
   { n: 5, title: "Exports, comparisons, reporting", body: "Region and indicator comparisons, reproducible exports and research reports.", status: "pending" },
@@ -30,7 +30,7 @@ export default function Roadmap() {
           {PHASES.map((p) => (
             <li key={p.n} data-testid={`phase-${p.n}`} className="relative">
               <span className={cn("absolute -left-[27px] top-1 flex h-3.5 w-3.5 rounded-full border-2 bg-card", p.status === "complete" ? "border-primary bg-primary" : "border-border")} />
-              <div className="flex flex-wrap items-center gap-2"><span className="font-mono text-xs text-muted-foreground">P{p.n}</span><span className="font-medium">{p.title}</span><StatusTag status={p.status === "complete" ? "complete" : "pending"} /></div>
+              <div className="flex flex-wrap items-center gap-2"><span className="font-mono text-xs text-muted-foreground">P{p.n}</span><span className="font-medium">{p.title}</span><StatusTag status={p.status} /></div>
               <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{p.body}</p>
             </li>
           ))}

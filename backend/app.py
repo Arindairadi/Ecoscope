@@ -4,12 +4,13 @@ from datetime import date, datetime, timezone
 from fastapi import FastAPI, HTTPException, Query
 
 from backend.catalog import INDICATORS, REGIONS, SOURCES
-from backend.models import Foundation, HealthStatus, Indicator, Region, Series
+from backend.models import Foundation, HealthStatus, Indicator, PowerSeries, Region, Series
+from backend.services.power import PowerError, monthly_temperature
 
 app = FastAPI(
-    title="EARTHSCOPE API",
-    version="0.1.0",
-    description="Phase 1 foundation. No scientific datasets or external database connected.",
+    title="Ecoscope API",
+    version="0.2.0",
+    description="NASA POWER monthly T2M point estimates. Other scientific sources and database pending.",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
     openapi_url="/api/openapi.json",
@@ -18,20 +19,20 @@ app = FastAPI(
 
 @app.get("/api/healthz", response_model=HealthStatus, operation_id="healthCheck")
 def health_check():
-    return HealthStatus(status="ok", service="EARTHSCOPE FastAPI",
+    return HealthStatus(status="ok", service="Ecoscope FastAPI",
                         timestamp=datetime.now(timezone.utc))
 
 
 @app.get("/api/foundation", response_model=Foundation, operation_id="getFoundation")
 def foundation():
     return Foundation(
-        phase="Phase 1 · Foundation",
+        phase="Phase 2 · First scientific source",
         backend="FastAPI",
         database="not_connected",
-        scientificData="not_connected",
+        scientificData="nasa_power_adapter_available",
         sources=SOURCES,
         capabilities=["REST health and catalog", "Validated geographic and date selection",
-                      "Explicit empty scientific results", "No credentials required"],
+                      "NASA POWER monthly T2M point retrieval", "No credentials required"],
     )
 
 
@@ -43,6 +44,18 @@ def regions():
 @app.get("/api/indicators", response_model=list[Indicator], operation_id="getIndicators")
 def indicators():
     return INDICATORS
+
+
+@app.get("/api/power/monthly", response_model=PowerSeries, operation_id="getPowerMonthly")
+async def power_monthly(latitude: float = Query(ge=-90, le=90, allow_inf_nan=False),
+                        longitude: float = Query(ge=-180, le=180, allow_inf_nan=False),
+                        start: str = Query(max_length=7), end: str = Query(max_length=7)):
+    try:
+        return await monthly_temperature(latitude, longitude, start, end)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except PowerError as exc:
+        raise HTTPException(exc.status, str(exc), headers={"Retry-After": "30"}) from exc
 
 
 @app.get("/api/series", response_model=Series, operation_id="getSeries")
@@ -59,7 +72,7 @@ def series(region: str = Query(max_length=50), indicator: str = Query(max_length
         raise HTTPException(422, "Future observations are unavailable. Forecast support is pending.")
     return Series(
         status="not_connected",
-        message="No scientific source is connected. No measurements, trends or statistics have been generated.",
+        message="This registry series endpoint has no data. Temperature is available separately through the NASA POWER point-query service; other indicators remain pending.",
         region=region, indicator=indicator, start=start, end=end, unit=selected.unit,
         observations=[],
     )

@@ -8,9 +8,9 @@ Browser
  │                  Leaflet map; Recharts-ready scientific result view
  └─ /api/*         Python FastAPI + Pydantic + Uvicorn
                     ├─ health and planning catalogs
-                    ├─ validated empty time-series responses
+                    ├─ NASA POWER monthly point T2M + validated empty legacy registry responses
                     └─ modular science adapter interface
-                         external APIs and Supabase/PostGIS NOT connected
+                         only NASA POWER T2M enabled; other APIs and Supabase/PostGIS pending
 ```
 
 The managed API service now starts `backend.run`, not the Express scaffold. Existing unused TypeScript server/database scaffold is retained for template compatibility; it is not the running scientific backend and no Drizzle schema is applied. No application database or external database is required by Phase 1.
@@ -61,6 +61,6 @@ Missing values stay `null`, never zero. Empty results mean unavailable data, not
 
 No secrets are required or returned. Do not access or print existing workspace secrets. Future external credentials belong in server-side Replit Secrets, never `VITE_*`, browser storage, source code, logs, screenshots or GitHub. Use least-privilege database credentials, parameterized queries and restricted access policies.
 
-Phase 1 API is read-only and has no user accounts, shared saved analyses or durable scientific storage. Theme preferences may be stored in browser local storage; this is not collaborative persistence. Add authentication and authorization before enabling write operations or private data.
+The API is read-only and has no user accounts, shared saved analyses or durable scientific storage. The NASA POWER response cache is bounded, process-local memory with original retrieval timestamps, not persistent storage. Theme preferences may be stored in browser local storage; this is not collaborative persistence. Add authentication and authorization before enabling write operations or private data.
 
 Supabase PostgreSQL/PostGIS is planned at the user's request. No project, database, extension, credentials, schema, migration or successful connection is claimed. Before connecting: authorize the intended project, verify free-tier constraints, use a server-only credential, explicitly approve migrations, and test connectivity without exposing secrets.

@@ -1,1 +1,1 @@
-"""EARTHSCOPE scientific API. No external data connections in Phase 1."""
+"""Ecoscope scientific API. No external data connections in Phase 1."""

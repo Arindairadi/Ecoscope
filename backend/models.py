@@ -68,3 +68,40 @@ class Series(StrictModel):
     end: date
     unit: str
     observations: list[Observation]
+
+
+class MonthlyValue(StrictModel):
+    month: str
+    value: float | None
+
+
+class PowerSeries(StrictModel):
+    status: Literal["ok", "no_data"]
+    message: str
+    latitude: float
+    longitude: float
+    requested_start: str
+    requested_end: str
+    available_start: str | None
+    available_end: str | None
+    unit: str
+    parameter: str
+    parameter_name: str
+    kind: str
+    source: str
+    source_url: str
+    documentation_url: str
+    retrieved_at: datetime | None
+    source_version: str | None
+    source_time_standard: str | None
+    spatial_caveat: str
+    attribution: str
+    license: str
+    expected_months: int
+    valid_months: int
+    missing_months: int
+    completeness_percent: float
+    mean: float | None
+    minimum: float | None
+    maximum: float | None
+    values: list[MonthlyValue]
