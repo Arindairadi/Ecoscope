@@ -73,7 +73,7 @@ Specific technologies and integrations will be documented according to the proje
 Once the project is pushed to GitHub, clone it using:
 
 ```bash
-git clone https://github.com/iradi2222/Ecoscope.git
+git clone https://github.com/arindairadi/Ecoscope.git
 ```
 
 Navigate to the project directory:
