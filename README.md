@@ -41,7 +41,7 @@ curl --fail http://localhost:80/api/healthz
 curl --fail 'http://localhost:80/api/series?region=uganda&indicator=temperature&start=2015-01-01&end=2025-12-31'
 ```
 
-`localhost:80` checks use the Replit shared proxy, not a service's private port. See [verification results](docs/VERIFICATION.md) for actual outcomes and limitations.
+
 
 ## Documentation
 
@@ -52,4 +52,4 @@ curl --fail 'http://localhost:80/api/series?region=uganda&indicator=temperature&
 - [Verification results](docs/VERIFICATION.md)
 - [NASA POWER source verification and integration semantics](docs/NASA_POWER.md)
 
-No external paid service, plan upgrade, add-on or database was provisioned. A paid Replit subscription does not authorize optional paid services.
+
