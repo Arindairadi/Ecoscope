@@ -1,5 +1,41 @@
 # Verification history
 
+## Interactive dashboard regression — 2026-11-14
+
+### Final outcomes
+
+| Check | Result | Observed outcome |
+|---|---|---|
+| `scripts/browser-controls.cjs` | **7 groups passed**, no page errors | Browser-only OSM tile failures displayed the failure state; after removing the test block and toggling the basemap, tiles loaded again. The run attempted 16 OSM tile requests. |
+| Uganda viewport preset | **PASS** | Selecting Uganda showed the Uganda viewport description and changed the rendered map tile coordinates after the fly-to animation. |
+| Map point selection and clearing | **PASS** | A map click changed the displayed point and placed one marker. Clear removed the marker and reset both edited and applied point displays to `none`. |
+| Indicator/date/region query | **PASS** | Actual browser requests carried `indicator=precipitation`, `start=2016-02-01`, and `end=2020-11-30`; changing the region also changed `region=global` to `region=uganda`. Responses were HTTP 200 with `status: not_connected` and `observations: []`. An intermediate date-edit request used `end=2025-12-31`. |
+| Series backend outage and retry | **PASS** | A browser-injected **TEST ONLY** 503 showed the error state with no fallback/chart. Retry reached the real API and returned HTTP 200 with an honest empty `not_connected` result. |
+| API health outage and retry | **PASS** | A browser-injected **TEST ONLY** health failure showed “Unreachable - click to retry”; after removing the test block, manual retry displayed `ok · Ecoscope FastAPI`. |
+| Mobile keyboard navigation | **PASS** | Enter opened the mobile navigation; Escape closed it; Enter on the Integrations and Workspace links navigated successfully. |
+| Responsive overflow | **PASS** | `document.documentElement.scrollWidth <= window.innerWidth` at **360, 390, 768, and 1024 px**. |
+| `scripts/browser-foundation.cjs` | **9 groups passed**, no page errors | Uganda fly-to, zoom, drag/pan, point selection/clear, basemap toggle, light/dark persistence across reload, navigation, series failure/retry, and mobile controls/overflow. |
+| `scripts/browser-power.cjs` | **12 groups passed**, no page errors | Existing real NASA POWER and regression checks passed, including chart interactions, no-fetch-before-Load, missing-vs-zero behavior, no-data behavior, 502/503/504 handling, retry, download equality, and mobile theme persistence. |
+| Live NASA POWER comparison | **PASS** | Direct source response matched all 24 monthly Kampala values for 2020-01 through 2021-12. Retrieval recorded at **2026-11-14T08:19:17.035274Z**; first month 22.27°C, equal-month mean 21.950416666666666°C, min 20.06°C, max 23.17°C. These are MERRA-2 modelled grid estimates, not station observations or Uganda-wide averages. |
+| FastAPI tests | **54 passed**, one deprecation warning | `python -m pytest backend/tests -q`. The OpenAPI contract test now follows external path references and checks each declared method, retaining the GET response checks while covering the expanded research API. |
+| Workspace TypeScript check | **Passed** | `pnpm run typecheck`. |
+| Frontend production build | **Passed** | `PORT=23026 BASE_PATH=/ pnpm --filter @workspace/earthscope run build`; existing tooltip sourcemap diagnostic and large JavaScript chunk warning remain non-blocking. |
+
+Tile failures and backend outage responses in the interactive suite were injected at the browser network layer and are explicitly **TEST ONLY**. Recovery checks removed those overrides and used the real development API. No synthetic environmental series was returned to the application, no authentication was bypassed, and no production data or services were changed.
+
+### Reproduce
+
+```sh
+PLAYWRIGHT_MODULE=/mnt/pid2/node_modules/playwright CHROMIUM_PATH=/repl/tools/bin/chromium node scripts/browser-controls.cjs
+PLAYWRIGHT_MODULE=/mnt/pid2/node_modules/playwright CHROMIUM_PATH=/repl/tools/bin/chromium node scripts/browser-foundation.cjs
+PLAYWRIGHT_MODULE=/mnt/pid2/node_modules/playwright CHROMIUM_PATH=/repl/tools/bin/chromium node scripts/browser-power.cjs
+python -m pytest backend/tests -q
+pnpm run typecheck
+PORT=23026 BASE_PATH=/ pnpm --filter @workspace/earthscope run build
+```
+
+Playwright results are written under ignored `generated-artifacts/`. Browser checks used the already provisioned Playwright and Chromium; no browser package or app dependency was added.
+
 ## Product rename to Ecoscope — 2026-11-14
 
 - Updated desktop/mobile branding, browser title, description, Open Graph/Twitter metadata, API display names, project documentation and the Replit artifact display title to **Ecoscope**. Preserved the full tagline.

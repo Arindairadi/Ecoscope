@@ -59,7 +59,7 @@ const assert = require('node:assert/strict');
     await check('navigation and return', async () => {
       await page.getByTestId('link-nav-integrations').click();
       await page.waitForURL('**/sources');
-      await page.getByText('NASA POWER',{exact:true}).waitFor();
+      await page.getByTestId('row-source-nasa-power').getByText('NASA POWER',{exact:true}).waitFor();
       await page.getByTestId('link-nav-roadmap').click();
       await page.waitForURL('**/roadmap');
       await page.getByTestId('link-nav-workspace').click();

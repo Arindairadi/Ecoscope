@@ -81,9 +81,8 @@ def test_frontend_contract_matches_runtime():
         if "$ref" in entry:
             research_spec = yaml.safe_load(Path("lib/api-spec/research.yaml").read_text())
             entry = research_spec["paths"][path]
-        for method in ("get", "post"):
-            if method in entry:
-                assert runtime["paths"][full_path][method]["operationId"] == entry[method]["operationId"]
+        for method, operation in entry.items():
+            assert runtime["paths"][full_path][method]["operationId"] == operation["operationId"]
         # Do not make live scientific requests in unit/contract tests.
         if path.startswith("/research/"):
             continue
