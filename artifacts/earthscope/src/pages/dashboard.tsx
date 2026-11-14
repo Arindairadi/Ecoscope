@@ -120,7 +120,8 @@ export default function Dashboard() {
         <div>
           <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-accent">Research workspace</div>
           <h1 className="font-serif text-2xl md:text-3xl">See the Planet. Detect the Trends.</h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">Phase 2, partial. One source is connected: NASA POWER monthly 2 m air temperature at a single selected grid point. A point estimate is not a national average and not a station record. Other indicators remain pending.</p>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">This workspace shows NASA POWER monthly 2 m air temperature at a single grid point (not a national average, not a station record); its other indicator tiles remain pending. Multi-source analysis (POWER climate variables, NOAA CO2, World Bank forest cover) with trend methods, comparison and reports lives on the Research desk; satellite imagery and FIRMS fire detections are on the Explorer.</p>
+          <Link href="/research" data-testid="link-open-research" className="mt-2 inline-flex items-center gap-1.5 rounded-sm bg-accent px-3 py-1.5 text-xs font-medium text-accent-foreground hover:opacity-90">Open the multi-source research desk <ArrowUpRight className="h-3.5 w-3.5" /></Link>
         </div>
         {foundation.data && (
           <div data-testid="text-scientific-data" className="rounded-sm border bg-card px-3 py-2 text-xs">

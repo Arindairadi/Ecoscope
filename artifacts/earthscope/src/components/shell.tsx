@@ -1,12 +1,14 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { Activity, Database, Map as MapIcon, Menu, Moon, Route as RouteIcon, Sun, X } from "lucide-react";
+import { Activity, Database, FlaskConical, Globe2, Map as MapIcon, Menu, Moon, Route as RouteIcon, Sun, X } from "lucide-react";
 import { getHealthCheckQueryKey, useHealthCheck } from "@workspace/api-client-react";
 import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/", label: "Workspace", icon: MapIcon },
+  { href: "/research", label: "Research", icon: FlaskConical },
+  { href: "/explorer", label: "Explorer", icon: Globe2 },
   { href: "/sources", label: "Integrations", icon: Database },
   { href: "/roadmap", label: "Roadmap & Method", icon: RouteIcon },
 ];
@@ -58,7 +60,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <div className="text-[10px] text-sidebar-foreground/55">Earth System Trend Detective</div>
         </div>
       </div>
-      <div className="mx-4 mb-3 rounded-sm border border-sidebar-primary/40 bg-sidebar-primary/10 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-sidebar-primary">Phase 2 · NASA POWER point data</div>
+      <div className="mx-4 mb-3 rounded-sm border border-sidebar-primary/40 bg-sidebar-primary/10 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-sidebar-primary">Research · imagery · fire points</div>
       <nav className="flex flex-col gap-0.5 px-2">
         {NAV.map((n) => {
           const active = loc === n.href;

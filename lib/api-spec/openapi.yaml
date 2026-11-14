@@ -6,6 +6,14 @@ info:
 servers:
   - url: /api
 paths:
+  /research/fires:
+    $ref: './research.yaml#/paths/~1research~1fires'
+  /research/run:
+    $ref: './research.yaml#/paths/~1research~1run'
+  /research/connectors:
+    $ref: './research.yaml#/paths/~1research~1connectors'
+  /research/layers:
+    $ref: './research.yaml#/paths/~1research~1layers'
   /power/monthly:
     get:
       operationId: getPowerMonthly

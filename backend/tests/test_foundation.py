@@ -78,7 +78,15 @@ def test_frontend_contract_matches_runtime():
     for path, entry in spec["paths"].items():
         full_path = f"/api{path}"
         assert full_path in runtime["paths"]
-        assert runtime["paths"][full_path]["get"]["operationId"] == entry["get"]["operationId"]
+        if "$ref" in entry:
+            research_spec = yaml.safe_load(Path("lib/api-spec/research.yaml").read_text())
+            entry = research_spec["paths"][path]
+        for method in ("get", "post"):
+            if method in entry:
+                assert runtime["paths"][full_path][method]["operationId"] == entry[method]["operationId"]
+        # Do not make live scientific requests in unit/contract tests.
+        if path.startswith("/research/"):
+            continue
         if path not in {"/series", "/power/monthly"}:
             result = client.get(full_path)
             assert result.status_code == 200

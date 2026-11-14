@@ -6,15 +6,17 @@ from fastapi import FastAPI, HTTPException, Query
 from backend.catalog import INDICATORS, REGIONS, SOURCES
 from backend.models import Foundation, HealthStatus, Indicator, PowerSeries, Region, Series
 from backend.services.power import PowerError, monthly_temperature
+from backend.research_routes import router as research_router
 
 app = FastAPI(
     title="Ecoscope API",
-    version="0.2.0",
-    description="NASA POWER monthly T2M point estimates. Other scientific sources and database pending.",
+    version="1.0.0",
+    description="Ecoscope public scientific series, transparent exploratory analysis and source capabilities. Shared cloud persistence and authorized sources remain gated.",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
     openapi_url="/api/openapi.json",
 )
+app.include_router(research_router)
 
 
 @app.get("/api/healthz", response_model=HealthStatus, operation_id="healthCheck")

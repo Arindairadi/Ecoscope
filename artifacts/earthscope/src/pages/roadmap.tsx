@@ -3,11 +3,11 @@ import { Panel, StatusTag } from "@/components/status";
 import { cn } from "@/lib/utils";
 
 const PHASES = [
-  { n: 1, title: "Foundation", body: "API service, region and indicator registries, series contract, map workspace and honest status reporting. Backend tests, TypeScript checks and live frontend/API connectivity verified. External scientific integrations remain pending.", status: "complete" },
-  { n: 2, title: "Scientific sources", body: "Partial. Implemented: NASA POWER monthly 2 m air temperature (T2M, MERRA-2 based modelled estimate) at a single selected grid point, with provenance, retrieval timestamp, completeness and JSON export. Not yet connected: precipitation, vegetation indices, forest cover, area averages. Verification of this slice is not claimed here.", status: "partial" },
-  { n: 3, title: "Validated trends", body: "Trend estimation with uncertainty, significance testing, seasonality handling and documented validation against reference data.", status: "pending" },
-  { n: 4, title: "Grounded explanations", body: "Plain-language interpretation that cites the specific observations and methods behind each statement.", status: "pending" },
-  { n: 5, title: "Exports, comparisons, reporting", body: "Region and indicator comparisons, reproducible exports and research reports.", status: "pending" },
+  { n: 1, title: "Foundation", body: "API service, region and indicator registries, series contract, map workspace and honest status reporting.", status: "complete" },
+  { n: 2, title: "Scientific sources", body: "Partial. Working: NASA POWER monthly point variables (T2M, PRECTOTCORR, RH2M, WS2M), NOAA global marine surface CO2, World Bank WDI national forest area, NASA GIBS raster imagery (NDVI, IGBP land cover, aerosol, historical drought hazard), and NASA FIRMS public MODIS 24 h detections. Blocked: FIRMS VIIRS API until an operator sets FIRMS_MAP_KEY; other connectors listed as documented only. Legacy root indicator tiles beyond temperature remain pending.", status: "partial" },
+  { n: 3, title: "Validated trends", body: "Partial. Server computes OLS, Sen slope, Mann-Kendall, Pettitt change point, seasonal baselines, anomalies and SPI-3, reporting eligibility and suppressing estimates when data are insufficient. Independent validation against reference studies is not claimed.", status: "partial" },
+  { n: 4, title: "Grounded explanations", body: "Partial. Deterministic rule-based interpretation and Q&A restating computed results only. No generative AI.", status: "partial" },
+  { n: 5, title: "Exports, comparisons, reporting", body: "Partial. Matched same-source comparisons, CSV/JSON/SVG exports, reproducible research bundle and printable HTML report. Saved selections are local to this browser only; no server or cloud storage.", status: "partial" },
 ];
 const METHOD = [
   ["Provenance first", "Every observation carries source, unit, retrieval time and kind (observation, modelled estimate, forecast, demonstration)."],

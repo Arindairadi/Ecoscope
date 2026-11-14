@@ -8,6 +8,435 @@
 import * as zod from 'zod';
 
 
+export const getFireDetectionsBodyWestMin = -180;
+export const getFireDetectionsBodyWestMax = 180;
+
+export const getFireDetectionsBodyEastMin = -180;
+export const getFireDetectionsBodyEastMax = 180;
+
+export const getFireDetectionsBodySouthMin = -90;
+export const getFireDetectionsBodySouthMax = 90;
+
+export const getFireDetectionsBodyNorthMin = -90;
+export const getFireDetectionsBodyNorthMax = 90;
+
+export const getFireDetectionsBodyDaysMax = 5;
+
+
+
+export const GetFireDetectionsBody = zod.object({
+  "source": zod.enum(['public_modis', 'firms_viirs']),
+  "west": zod.number().min(getFireDetectionsBodyWestMin).max(getFireDetectionsBodyWestMax),
+  "east": zod.number().min(getFireDetectionsBodyEastMin).max(getFireDetectionsBodyEastMax),
+  "south": zod.number().min(getFireDetectionsBodySouthMin).max(getFireDetectionsBodySouthMax),
+  "north": zod.number().min(getFireDetectionsBodyNorthMin).max(getFireDetectionsBodyNorthMax),
+  "days": zod.number().int().min(1).max(getFireDetectionsBodyDaysMax),
+  "date": zod.string().nullish()
+})
+
+export const getFireDetectionsResponseSelectionWestMin = -180;
+export const getFireDetectionsResponseSelectionWestMax = 180;
+
+export const getFireDetectionsResponseSelectionEastMin = -180;
+export const getFireDetectionsResponseSelectionEastMax = 180;
+
+export const getFireDetectionsResponseSelectionSouthMin = -90;
+export const getFireDetectionsResponseSelectionSouthMax = 90;
+
+export const getFireDetectionsResponseSelectionNorthMin = -90;
+export const getFireDetectionsResponseSelectionNorthMax = 90;
+
+export const getFireDetectionsResponseSelectionDaysMax = 5;
+
+
+
+export const GetFireDetectionsResponse = zod.object({
+  "source": zod.string(),
+  "source_url": zod.string(),
+  "retrieved_at": zod.string(),
+  "coverage_start": zod.string().nullable(),
+  "coverage_end": zod.string().nullable(),
+  "count_in_bbox": zod.number().int(),
+  "returned_count": zod.number().int(),
+  "truncated": zod.boolean(),
+  "resolution": zod.string(),
+  "attribution": zod.string(),
+  "warnings": zod.array(zod.string()),
+  "features": zod.array(zod.object({
+  "latitude": zod.number(),
+  "longitude": zod.number(),
+  "acquired": zod.string(),
+  "satellite": zod.string(),
+  "confidence": zod.string(),
+  "frp_mw": zod.number().nullable()
+})),
+  "selection": zod.object({
+  "source": zod.enum(['public_modis', 'firms_viirs']),
+  "west": zod.number().min(getFireDetectionsResponseSelectionWestMin).max(getFireDetectionsResponseSelectionWestMax),
+  "east": zod.number().min(getFireDetectionsResponseSelectionEastMin).max(getFireDetectionsResponseSelectionEastMax),
+  "south": zod.number().min(getFireDetectionsResponseSelectionSouthMin).max(getFireDetectionsResponseSelectionSouthMax),
+  "north": zod.number().min(getFireDetectionsResponseSelectionNorthMin).max(getFireDetectionsResponseSelectionNorthMax),
+  "days": zod.number().int().min(1).max(getFireDetectionsResponseSelectionDaysMax),
+  "date": zod.string().nullish()
+})
+})
+
+
+export const runResearchBodySelectionLatitudeMin = -90;
+export const runResearchBodySelectionLatitudeMax = 90;
+
+export const runResearchBodySelectionLongitudeMin = -180;
+export const runResearchBodySelectionLongitudeMax = 180;
+
+export const runResearchBodySelectionCountryRegExp = new RegExp('^[A-Z]{3}$');
+export const runResearchBodyComparisonOneLatitudeMin = -90;
+export const runResearchBodyComparisonOneLatitudeMax = 90;
+
+export const runResearchBodyComparisonOneLongitudeMin = -180;
+export const runResearchBodyComparisonOneLongitudeMax = 180;
+
+export const runResearchBodyComparisonOneCountryRegExp = new RegExp('^[A-Z]{3}$');
+export const runResearchBodyBaselineStartMin = 1979;
+export const runResearchBodyBaselineStartMax = 2100;
+
+export const runResearchBodyBaselineEndMin = 1979;
+export const runResearchBodyBaselineEndMax = 2100;
+
+export const runResearchBodyQuestionMax = 500;
+
+
+
+export const RunResearchBody = zod.object({
+  "selection": zod.object({
+  "source": zod.enum(['power', 'noaa', 'worldbank']),
+  "indicator": zod.enum(['T2M', 'PRECTOTCORR', 'RH2M', 'WS2M', 'co2', 'forest']),
+  "latitude": zod.number().min(runResearchBodySelectionLatitudeMin).max(runResearchBodySelectionLatitudeMax),
+  "longitude": zod.number().min(runResearchBodySelectionLongitudeMin).max(runResearchBodySelectionLongitudeMax),
+  "country": zod.string().regex(runResearchBodySelectionCountryRegExp),
+  "start": zod.string(),
+  "end": zod.string()
+}),
+  "comparison": zod.union([zod.object({
+  "source": zod.enum(['power', 'noaa', 'worldbank']),
+  "indicator": zod.enum(['T2M', 'PRECTOTCORR', 'RH2M', 'WS2M', 'co2', 'forest']),
+  "latitude": zod.number().min(runResearchBodyComparisonOneLatitudeMin).max(runResearchBodyComparisonOneLatitudeMax),
+  "longitude": zod.number().min(runResearchBodyComparisonOneLongitudeMin).max(runResearchBodyComparisonOneLongitudeMax),
+  "country": zod.string().regex(runResearchBodyComparisonOneCountryRegExp),
+  "start": zod.string(),
+  "end": zod.string()
+}),zod.null()]).optional(),
+  "baseline_start": zod.number().int().min(runResearchBodyBaselineStartMin).max(runResearchBodyBaselineStartMax),
+  "baseline_end": zod.number().int().min(runResearchBodyBaselineEndMin).max(runResearchBodyBaselineEndMax),
+  "question": zod.string().max(runResearchBodyQuestionMax).optional()
+})
+
+export const runResearchResponseDatasetSelectionLatitudeMin = -90;
+export const runResearchResponseDatasetSelectionLatitudeMax = 90;
+
+export const runResearchResponseDatasetSelectionLongitudeMin = -180;
+export const runResearchResponseDatasetSelectionLongitudeMax = 180;
+
+export const runResearchResponseDatasetSelectionCountryRegExp = new RegExp('^[A-Z]{3}$');
+export const runResearchResponseComparisonDatasetOneSelectionLatitudeMin = -90;
+export const runResearchResponseComparisonDatasetOneSelectionLatitudeMax = 90;
+
+export const runResearchResponseComparisonDatasetOneSelectionLongitudeMin = -180;
+export const runResearchResponseComparisonDatasetOneSelectionLongitudeMax = 180;
+
+export const runResearchResponseComparisonDatasetOneSelectionCountryRegExp = new RegExp('^[A-Z]{3}$');
+
+
+export const RunResearchResponse = zod.object({
+  "dataset": zod.object({
+  "id": zod.string(),
+  "label": zod.string(),
+  "source": zod.string(),
+  "source_url": zod.string(),
+  "documentation_url": zod.string(),
+  "license": zod.string(),
+  "attribution": zod.string(),
+  "retrieved_at": zod.string().nullable(),
+  "kind": zod.string(),
+  "unit": zod.string(),
+  "frequency": zod.enum(['monthly', 'annual']),
+  "spatial_scope": zod.string(),
+  "resolution": zod.string(),
+  "location": zod.string(),
+  "requested_start": zod.string(),
+  "requested_end": zod.string(),
+  "available_start": zod.string().nullable(),
+  "available_end": zod.string().nullable(),
+  "coverage_percent": zod.number(),
+  "expected_count": zod.number().int(),
+  "valid_count": zod.number().int(),
+  "warnings": zod.array(zod.string()),
+  "values": zod.array(zod.object({
+  "period": zod.string(),
+  "value": zod.number().nullable(),
+  "uncertainty": zod.number().nullable()
+})),
+  "fingerprint": zod.string(),
+  "selection": zod.object({
+  "source": zod.enum(['power', 'noaa', 'worldbank']),
+  "indicator": zod.enum(['T2M', 'PRECTOTCORR', 'RH2M', 'WS2M', 'co2', 'forest']),
+  "latitude": zod.number().min(runResearchResponseDatasetSelectionLatitudeMin).max(runResearchResponseDatasetSelectionLatitudeMax),
+  "longitude": zod.number().min(runResearchResponseDatasetSelectionLongitudeMin).max(runResearchResponseDatasetSelectionLongitudeMax),
+  "country": zod.string().regex(runResearchResponseDatasetSelectionCountryRegExp),
+  "start": zod.string(),
+  "end": zod.string()
+})
+}),
+  "analysis": zod.object({
+  "status": zod.string(),
+  "method_version": zod.string(),
+  "window": zod.string(),
+  "baseline": zod.string(),
+  "n": zod.number().int(),
+  "complete_years": zod.number().int(),
+  "coverage_percent": zod.number(),
+  "annual_values": zod.array(zod.object({
+  "period": zod.string(),
+  "value": zod.number().nullable(),
+  "uncertainty": zod.number().nullable()
+})),
+  "ols": zod.object({
+  "status": zod.string(),
+  "label": zod.string(),
+  "estimate": zod.number().nullable(),
+  "unit": zod.string(),
+  "lower": zod.number().nullable(),
+  "upper": zod.number().nullable(),
+  "p_value": zod.number().nullable(),
+  "details": zod.string()
+}),
+  "sen": zod.object({
+  "status": zod.string(),
+  "label": zod.string(),
+  "estimate": zod.number().nullable(),
+  "unit": zod.string(),
+  "lower": zod.number().nullable(),
+  "upper": zod.number().nullable(),
+  "p_value": zod.number().nullable(),
+  "details": zod.string()
+}),
+  "mann_kendall": zod.object({
+  "status": zod.string(),
+  "label": zod.string(),
+  "estimate": zod.number().nullable(),
+  "unit": zod.string(),
+  "lower": zod.number().nullable(),
+  "upper": zod.number().nullable(),
+  "p_value": zod.number().nullable(),
+  "details": zod.string()
+}),
+  "change_point": zod.object({
+  "status": zod.string(),
+  "label": zod.string(),
+  "estimate": zod.number().nullable(),
+  "unit": zod.string(),
+  "lower": zod.number().nullable(),
+  "upper": zod.number().nullable(),
+  "p_value": zod.number().nullable(),
+  "details": zod.string()
+}),
+  "spi": zod.object({
+  "status": zod.string(),
+  "label": zod.string(),
+  "estimate": zod.number().nullable(),
+  "unit": zod.string(),
+  "lower": zod.number().nullable(),
+  "upper": zod.number().nullable(),
+  "p_value": zod.number().nullable(),
+  "details": zod.string()
+}),
+  "seasonality": zod.array(zod.object({
+  "month": zod.number().int(),
+  "count": zod.number().int(),
+  "mean": zod.number().nullable(),
+  "std": zod.number().nullable()
+})),
+  "anomalies": zod.array(zod.object({
+  "period": zod.string(),
+  "difference": zod.number().nullable(),
+  "z_score": zod.number().nullable(),
+  "outlier": zod.boolean(),
+  "score": zod.number().nullable(),
+  "spi3": zod.number().nullable()
+})),
+  "warnings": zod.array(zod.string()),
+  "interpretation": zod.array(zod.string())
+}),
+  "comparison_dataset": zod.union([zod.object({
+  "id": zod.string(),
+  "label": zod.string(),
+  "source": zod.string(),
+  "source_url": zod.string(),
+  "documentation_url": zod.string(),
+  "license": zod.string(),
+  "attribution": zod.string(),
+  "retrieved_at": zod.string().nullable(),
+  "kind": zod.string(),
+  "unit": zod.string(),
+  "frequency": zod.enum(['monthly', 'annual']),
+  "spatial_scope": zod.string(),
+  "resolution": zod.string(),
+  "location": zod.string(),
+  "requested_start": zod.string(),
+  "requested_end": zod.string(),
+  "available_start": zod.string().nullable(),
+  "available_end": zod.string().nullable(),
+  "coverage_percent": zod.number(),
+  "expected_count": zod.number().int(),
+  "valid_count": zod.number().int(),
+  "warnings": zod.array(zod.string()),
+  "values": zod.array(zod.object({
+  "period": zod.string(),
+  "value": zod.number().nullable(),
+  "uncertainty": zod.number().nullable()
+})),
+  "fingerprint": zod.string(),
+  "selection": zod.object({
+  "source": zod.enum(['power', 'noaa', 'worldbank']),
+  "indicator": zod.enum(['T2M', 'PRECTOTCORR', 'RH2M', 'WS2M', 'co2', 'forest']),
+  "latitude": zod.number().min(runResearchResponseComparisonDatasetOneSelectionLatitudeMin).max(runResearchResponseComparisonDatasetOneSelectionLatitudeMax),
+  "longitude": zod.number().min(runResearchResponseComparisonDatasetOneSelectionLongitudeMin).max(runResearchResponseComparisonDatasetOneSelectionLongitudeMax),
+  "country": zod.string().regex(runResearchResponseComparisonDatasetOneSelectionCountryRegExp),
+  "start": zod.string(),
+  "end": zod.string()
+})
+}),zod.null()]),
+  "comparison_analysis": zod.union([zod.object({
+  "status": zod.string(),
+  "method_version": zod.string(),
+  "window": zod.string(),
+  "baseline": zod.string(),
+  "n": zod.number().int(),
+  "complete_years": zod.number().int(),
+  "coverage_percent": zod.number(),
+  "annual_values": zod.array(zod.object({
+  "period": zod.string(),
+  "value": zod.number().nullable(),
+  "uncertainty": zod.number().nullable()
+})),
+  "ols": zod.object({
+  "status": zod.string(),
+  "label": zod.string(),
+  "estimate": zod.number().nullable(),
+  "unit": zod.string(),
+  "lower": zod.number().nullable(),
+  "upper": zod.number().nullable(),
+  "p_value": zod.number().nullable(),
+  "details": zod.string()
+}),
+  "sen": zod.object({
+  "status": zod.string(),
+  "label": zod.string(),
+  "estimate": zod.number().nullable(),
+  "unit": zod.string(),
+  "lower": zod.number().nullable(),
+  "upper": zod.number().nullable(),
+  "p_value": zod.number().nullable(),
+  "details": zod.string()
+}),
+  "mann_kendall": zod.object({
+  "status": zod.string(),
+  "label": zod.string(),
+  "estimate": zod.number().nullable(),
+  "unit": zod.string(),
+  "lower": zod.number().nullable(),
+  "upper": zod.number().nullable(),
+  "p_value": zod.number().nullable(),
+  "details": zod.string()
+}),
+  "change_point": zod.object({
+  "status": zod.string(),
+  "label": zod.string(),
+  "estimate": zod.number().nullable(),
+  "unit": zod.string(),
+  "lower": zod.number().nullable(),
+  "upper": zod.number().nullable(),
+  "p_value": zod.number().nullable(),
+  "details": zod.string()
+}),
+  "spi": zod.object({
+  "status": zod.string(),
+  "label": zod.string(),
+  "estimate": zod.number().nullable(),
+  "unit": zod.string(),
+  "lower": zod.number().nullable(),
+  "upper": zod.number().nullable(),
+  "p_value": zod.number().nullable(),
+  "details": zod.string()
+}),
+  "seasonality": zod.array(zod.object({
+  "month": zod.number().int(),
+  "count": zod.number().int(),
+  "mean": zod.number().nullable(),
+  "std": zod.number().nullable()
+})),
+  "anomalies": zod.array(zod.object({
+  "period": zod.string(),
+  "difference": zod.number().nullable(),
+  "z_score": zod.number().nullable(),
+  "outlier": zod.boolean(),
+  "score": zod.number().nullable(),
+  "spi3": zod.number().nullable()
+})),
+  "warnings": zod.array(zod.string()),
+  "interpretation": zod.array(zod.string())
+}),zod.null()]),
+  "comparison": zod.union([zod.object({
+  "status": zod.string(),
+  "matched_count": zod.number().int(),
+  "mean_difference": zod.number().nullable(),
+  "unit": zod.string(),
+  "pearson": zod.number().nullable(),
+  "spearman": zod.number().nullable(),
+  "method": zod.string(),
+  "warnings": zod.array(zod.string()),
+  "values": zod.array(zod.object({
+  "period": zod.string(),
+  "left": zod.number(),
+  "right": zod.number(),
+  "difference": zod.number()
+}))
+}),zod.null()]),
+  "explanation_mode": zod.string(),
+  "answer": zod.string(),
+  "generated_at": zod.string()
+})
+
+
+export const GetResearchConnectorsResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "status": zod.string(),
+  "detail": zod.string(),
+  "documentation_url": zod.string(),
+  "setup": zod.array(zod.string()),
+  "secret_names": zod.array(zod.string())
+})
+export const GetResearchConnectorsResponse = zod.array(GetResearchConnectorsResponseItem)
+
+
+export const GetSpatialLayersResponse = zod.object({
+  "retrieved_at": zod.string(),
+  "layers": zod.array(zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "template": zod.string(),
+  "legend": zod.string().nullable(),
+  "start": zod.string().nullable(),
+  "end": zod.string().nullable(),
+  "default_date": zod.string().nullable(),
+  "max_zoom": zod.number().int(),
+  "attribution": zod.string(),
+  "caveat": zod.string(),
+  "documentation_url": zod.string()
+}))
+})
+
+
 export const getPowerMonthlyQueryLatitudeMin = -90;
 export const getPowerMonthlyQueryLatitudeMax = 90;
 

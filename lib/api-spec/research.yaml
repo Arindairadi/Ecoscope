@@ -1,0 +1,275 @@
+openapi: 3.1.0
+info: {title: Research, version: 1.0.0}
+paths:
+  /research/fires:
+    post:
+      operationId: getFireDetections
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/FireInput'}
+      responses:
+        "200":
+          description: Bounded satellite thermal detections; not exhaustive fires.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/FireDataset'}
+  /research/run:
+    post:
+      operationId: runResearch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ResearchInput'}
+      responses:
+        "200":
+          description: Retrieved scientific evidence with computed analysis.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ResearchResult'}
+  /research/connectors:
+    get:
+      operationId: getResearchConnectors
+      responses:
+        "200":
+          description: Honest connector status, without secret values.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/ConnectorRecord'}
+  /research/layers:
+    get:
+      operationId: getSpatialLayers
+      responses:
+        "200":
+          description: Allowlisted NASA GIBS layer capabilities.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SpatialCatalog'}
+components:
+  schemas:
+    FireInput:
+      type: object
+      required: [source, west, south, east, north, days]
+      properties:
+        source: {type: string, enum: [public_modis, firms_viirs]}
+        west: {type: number, minimum: -180, maximum: 180}
+        east: {type: number, minimum: -180, maximum: 180}
+        south: {type: number, minimum: -90, maximum: 90}
+        north: {type: number, minimum: -90, maximum: 90}
+        days: {type: integer, minimum: 1, maximum: 5}
+        date: {type: [string, "null"]}
+    FirePoint:
+      type: object
+      required: [latitude, longitude, acquired, satellite, confidence, frp_mw]
+      properties:
+        latitude: {type: number}
+        longitude: {type: number}
+        acquired: {type: string}
+        satellite: {type: string}
+        confidence: {type: string}
+        frp_mw: {type: [number, "null"]}
+    FireDataset:
+      type: object
+      required: [source, source_url, retrieved_at, coverage_start, coverage_end, count_in_bbox, returned_count, truncated, resolution, attribution, warnings, features, selection]
+      properties:
+        source: {type: string}
+        source_url: {type: string}
+        retrieved_at: {type: string}
+        coverage_start: {type: [string, "null"]}
+        coverage_end: {type: [string, "null"]}
+        count_in_bbox: {type: integer}
+        returned_count: {type: integer}
+        truncated: {type: boolean}
+        resolution: {type: string}
+        attribution: {type: string}
+        warnings: {type: array, items: {type: string}}
+        features: {type: array, items: {$ref: '#/components/schemas/FirePoint'}}
+        selection: {$ref: '#/components/schemas/FireInput'}
+    ResearchSelection:
+      type: object
+      required: [source, indicator, latitude, longitude, country, start, end]
+      properties:
+        source: {type: string, enum: [power, noaa, worldbank]}
+        indicator: {type: string, enum: [T2M, PRECTOTCORR, RH2M, WS2M, co2, forest]}
+        latitude: {type: number, minimum: -90, maximum: 90}
+        longitude: {type: number, minimum: -180, maximum: 180}
+        country: {type: string, pattern: '^[A-Z]{3}$'}
+        start: {type: string}
+        end: {type: string}
+    ResearchInput:
+      type: object
+      required: [selection, baseline_start, baseline_end]
+      properties:
+        selection: {$ref: '#/components/schemas/ResearchSelection'}
+        comparison:
+          anyOf:
+            - {$ref: '#/components/schemas/ResearchSelection'}
+            - {type: "null"}
+        baseline_start: {type: integer, minimum: 1979, maximum: 2100}
+        baseline_end: {type: integer, minimum: 1979, maximum: 2100}
+        question: {type: string, maxLength: 500}
+    ResearchValue:
+      type: object
+      required: [period, value, uncertainty]
+      properties:
+        period: {type: string}
+        value: {type: [number, "null"]}
+        uncertainty: {type: [number, "null"]}
+    ResearchDataset:
+      type: object
+      required: [id, label, source, source_url, documentation_url, license, attribution, retrieved_at, kind, unit, frequency, spatial_scope, resolution, location, requested_start, requested_end, available_start, available_end, coverage_percent, expected_count, valid_count, warnings, values, fingerprint, selection]
+      properties:
+        id: {type: string}
+        label: {type: string}
+        source: {type: string}
+        source_url: {type: string}
+        documentation_url: {type: string}
+        license: {type: string}
+        attribution: {type: string}
+        retrieved_at: {type: [string, "null"]}
+        kind: {type: string}
+        unit: {type: string}
+        frequency: {type: string, enum: [monthly, annual]}
+        spatial_scope: {type: string}
+        resolution: {type: string}
+        location: {type: string}
+        requested_start: {type: string}
+        requested_end: {type: string}
+        available_start: {type: [string, "null"]}
+        available_end: {type: [string, "null"]}
+        coverage_percent: {type: number}
+        expected_count: {type: integer}
+        valid_count: {type: integer}
+        warnings: {type: array, items: {type: string}}
+        values: {type: array, items: {$ref: '#/components/schemas/ResearchValue'}}
+        fingerprint: {type: string}
+        selection: {$ref: '#/components/schemas/ResearchSelection'}
+    MethodResult:
+      type: object
+      required: [status, label, estimate, unit, lower, upper, p_value, details]
+      properties:
+        status: {type: string}
+        label: {type: string}
+        estimate: {type: [number, "null"]}
+        unit: {type: string}
+        lower: {type: [number, "null"]}
+        upper: {type: [number, "null"]}
+        p_value: {type: [number, "null"]}
+        details: {type: string}
+    SeasonalMonth:
+      type: object
+      required: [month, count, mean, std]
+      properties:
+        month: {type: integer}
+        count: {type: integer}
+        mean: {type: [number, "null"]}
+        std: {type: [number, "null"]}
+    AnomalyValue:
+      type: object
+      required: [period, difference, z_score, outlier, score, spi3]
+      properties:
+        period: {type: string}
+        difference: {type: [number, "null"]}
+        z_score: {type: [number, "null"]}
+        outlier: {type: boolean}
+        score: {type: [number, "null"]}
+        spi3: {type: [number, "null"]}
+    AnalysisResult:
+      type: object
+      required: [status, method_version, window, baseline, n, complete_years, coverage_percent, annual_values, ols, sen, mann_kendall, change_point, spi, seasonality, anomalies, warnings, interpretation]
+      properties:
+        status: {type: string}
+        method_version: {type: string}
+        window: {type: string}
+        baseline: {type: string}
+        n: {type: integer}
+        complete_years: {type: integer}
+        coverage_percent: {type: number}
+        annual_values: {type: array, items: {$ref: '#/components/schemas/ResearchValue'}}
+        ols: {$ref: '#/components/schemas/MethodResult'}
+        sen: {$ref: '#/components/schemas/MethodResult'}
+        mann_kendall: {$ref: '#/components/schemas/MethodResult'}
+        change_point: {$ref: '#/components/schemas/MethodResult'}
+        spi: {$ref: '#/components/schemas/MethodResult'}
+        seasonality: {type: array, items: {$ref: '#/components/schemas/SeasonalMonth'}}
+        anomalies: {type: array, items: {$ref: '#/components/schemas/AnomalyValue'}}
+        warnings: {type: array, items: {type: string}}
+        interpretation: {type: array, items: {type: string}}
+    ComparisonRow:
+      type: object
+      required: [period, left, right, difference]
+      properties:
+        period: {type: string}
+        left: {type: number}
+        right: {type: number}
+        difference: {type: number}
+    ComparisonResult:
+      type: object
+      required: [status, matched_count, mean_difference, unit, pearson, spearman, method, warnings, values]
+      properties:
+        status: {type: string}
+        matched_count: {type: integer}
+        mean_difference: {type: [number, "null"]}
+        unit: {type: string}
+        pearson: {type: [number, "null"]}
+        spearman: {type: [number, "null"]}
+        method: {type: string}
+        warnings: {type: array, items: {type: string}}
+        values: {type: array, items: {$ref: '#/components/schemas/ComparisonRow'}}
+    ResearchResult:
+      type: object
+      required: [dataset, analysis, comparison_dataset, comparison_analysis, comparison, explanation_mode, answer, generated_at]
+      properties:
+        dataset: {$ref: '#/components/schemas/ResearchDataset'}
+        analysis: {$ref: '#/components/schemas/AnalysisResult'}
+        comparison_dataset:
+          anyOf:
+            - {$ref: '#/components/schemas/ResearchDataset'}
+            - {type: "null"}
+        comparison_analysis:
+          anyOf:
+            - {$ref: '#/components/schemas/AnalysisResult'}
+            - {type: "null"}
+        comparison:
+          anyOf:
+            - {$ref: '#/components/schemas/ComparisonResult'}
+            - {type: "null"}
+        explanation_mode: {type: string}
+        answer: {type: string}
+        generated_at: {type: string}
+    ConnectorRecord:
+      type: object
+      required: [id, name, status, detail, documentation_url, setup, secret_names]
+      properties:
+        id: {type: string}
+        name: {type: string}
+        status: {type: string}
+        detail: {type: string}
+        documentation_url: {type: string}
+        setup: {type: array, items: {type: string}}
+        secret_names: {type: array, items: {type: string}}
+    SpatialLayer:
+      type: object
+      required: [id, title, template, legend, start, end, default_date, max_zoom, attribution, caveat, documentation_url]
+      properties:
+        id: {type: string}
+        title: {type: string}
+        template: {type: string}
+        legend: {type: [string, "null"]}
+        start: {type: [string, "null"]}
+        end: {type: [string, "null"]}
+        default_date: {type: [string, "null"]}
+        max_zoom: {type: integer}
+        attribution: {type: string}
+        caveat: {type: string}
+        documentation_url: {type: string}
+    SpatialCatalog:
+      type: object
+      required: [retrieved_at, layers]
+      properties:
+        retrieved_at: {type: string}
+        layers: {type: array, items: {$ref: '#/components/schemas/SpatialLayer'}}

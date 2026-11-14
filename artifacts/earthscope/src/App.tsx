@@ -7,6 +7,8 @@ import NotFound from '@/pages/not-found';
 import Dashboard from '@/pages/dashboard';
 import Sources from '@/pages/sources';
 import Roadmap from '@/pages/roadmap';
+import Research from '@/pages/research';
+import Explorer from '@/pages/explorer';
 import { Shell } from '@/components/shell';
 import { ThemeProvider } from '@/lib/theme';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
@@ -19,6 +21,8 @@ function Router() {
       <RoutedErrorBoundary>
         <Switch>
           <Route path="/" component={Dashboard} />
+          <Route path="/research" component={Research} />
+          <Route path="/explorer" component={Explorer} />
           <Route path="/sources" component={Sources} />
           <Route path="/roadmap" component={Roadmap} />
           <Route component={NotFound} />

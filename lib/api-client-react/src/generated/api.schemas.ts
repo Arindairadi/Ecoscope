@@ -131,6 +131,300 @@ export interface Series {
   observations: Observation[];
 }
 
+export type FireInputSource = typeof FireInputSource[keyof typeof FireInputSource];
+
+
+export const FireInputSource = {
+  public_modis: 'public_modis',
+  firms_viirs: 'firms_viirs',
+} as const;
+
+export interface FireInput {
+  source: FireInputSource;
+  /**
+     * @minimum -180
+     * @maximum 180
+     */
+  west: number;
+  /**
+     * @minimum -180
+     * @maximum 180
+     */
+  east: number;
+  /**
+     * @minimum -90
+     * @maximum 90
+     */
+  south: number;
+  /**
+     * @minimum -90
+     * @maximum 90
+     */
+  north: number;
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  days: number;
+  /** @nullable */
+  date?: string | null;
+}
+
+export interface FirePoint {
+  latitude: number;
+  longitude: number;
+  acquired: string;
+  satellite: string;
+  confidence: string;
+  /** @nullable */
+  frp_mw: number | null;
+}
+
+export interface FireDataset {
+  source: string;
+  source_url: string;
+  retrieved_at: string;
+  /** @nullable */
+  coverage_start: string | null;
+  /** @nullable */
+  coverage_end: string | null;
+  count_in_bbox: number;
+  returned_count: number;
+  truncated: boolean;
+  resolution: string;
+  attribution: string;
+  warnings: string[];
+  features: FirePoint[];
+  selection: FireInput;
+}
+
+export type ResearchSelectionSource = typeof ResearchSelectionSource[keyof typeof ResearchSelectionSource];
+
+
+export const ResearchSelectionSource = {
+  power: 'power',
+  noaa: 'noaa',
+  worldbank: 'worldbank',
+} as const;
+
+export type ResearchSelectionIndicator = typeof ResearchSelectionIndicator[keyof typeof ResearchSelectionIndicator];
+
+
+export const ResearchSelectionIndicator = {
+  T2M: 'T2M',
+  PRECTOTCORR: 'PRECTOTCORR',
+  RH2M: 'RH2M',
+  WS2M: 'WS2M',
+  co2: 'co2',
+  forest: 'forest',
+} as const;
+
+export interface ResearchSelection {
+  source: ResearchSelectionSource;
+  indicator: ResearchSelectionIndicator;
+  /**
+     * @minimum -90
+     * @maximum 90
+     */
+  latitude: number;
+  /**
+     * @minimum -180
+     * @maximum 180
+     */
+  longitude: number;
+  /** @pattern ^[A-Z]{3}$ */
+  country: string;
+  start: string;
+  end: string;
+}
+
+export interface ResearchInput {
+  selection: ResearchSelection;
+  comparison?: ResearchSelection | null;
+  /**
+     * @minimum 1979
+     * @maximum 2100
+     */
+  baseline_start: number;
+  /**
+     * @minimum 1979
+     * @maximum 2100
+     */
+  baseline_end: number;
+  /** @maxLength 500 */
+  question?: string;
+}
+
+export interface ResearchValue {
+  period: string;
+  /** @nullable */
+  value: number | null;
+  /** @nullable */
+  uncertainty: number | null;
+}
+
+export type ResearchDatasetFrequency = typeof ResearchDatasetFrequency[keyof typeof ResearchDatasetFrequency];
+
+
+export const ResearchDatasetFrequency = {
+  monthly: 'monthly',
+  annual: 'annual',
+} as const;
+
+export interface ResearchDataset {
+  id: string;
+  label: string;
+  source: string;
+  source_url: string;
+  documentation_url: string;
+  license: string;
+  attribution: string;
+  /** @nullable */
+  retrieved_at: string | null;
+  kind: string;
+  unit: string;
+  frequency: ResearchDatasetFrequency;
+  spatial_scope: string;
+  resolution: string;
+  location: string;
+  requested_start: string;
+  requested_end: string;
+  /** @nullable */
+  available_start: string | null;
+  /** @nullable */
+  available_end: string | null;
+  coverage_percent: number;
+  expected_count: number;
+  valid_count: number;
+  warnings: string[];
+  values: ResearchValue[];
+  fingerprint: string;
+  selection: ResearchSelection;
+}
+
+export interface MethodResult {
+  status: string;
+  label: string;
+  /** @nullable */
+  estimate: number | null;
+  unit: string;
+  /** @nullable */
+  lower: number | null;
+  /** @nullable */
+  upper: number | null;
+  /** @nullable */
+  p_value: number | null;
+  details: string;
+}
+
+export interface SeasonalMonth {
+  month: number;
+  count: number;
+  /** @nullable */
+  mean: number | null;
+  /** @nullable */
+  std: number | null;
+}
+
+export interface AnomalyValue {
+  period: string;
+  /** @nullable */
+  difference: number | null;
+  /** @nullable */
+  z_score: number | null;
+  outlier: boolean;
+  /** @nullable */
+  score: number | null;
+  /** @nullable */
+  spi3: number | null;
+}
+
+export interface AnalysisResult {
+  status: string;
+  method_version: string;
+  window: string;
+  baseline: string;
+  n: number;
+  complete_years: number;
+  coverage_percent: number;
+  annual_values: ResearchValue[];
+  ols: MethodResult;
+  sen: MethodResult;
+  mann_kendall: MethodResult;
+  change_point: MethodResult;
+  spi: MethodResult;
+  seasonality: SeasonalMonth[];
+  anomalies: AnomalyValue[];
+  warnings: string[];
+  interpretation: string[];
+}
+
+export interface ComparisonRow {
+  period: string;
+  left: number;
+  right: number;
+  difference: number;
+}
+
+export interface ComparisonResult {
+  status: string;
+  matched_count: number;
+  /** @nullable */
+  mean_difference: number | null;
+  unit: string;
+  /** @nullable */
+  pearson: number | null;
+  /** @nullable */
+  spearman: number | null;
+  method: string;
+  warnings: string[];
+  values: ComparisonRow[];
+}
+
+export interface ResearchResult {
+  dataset: ResearchDataset;
+  analysis: AnalysisResult;
+  comparison_dataset: ResearchDataset | null;
+  comparison_analysis: AnalysisResult | null;
+  comparison: ComparisonResult | null;
+  explanation_mode: string;
+  answer: string;
+  generated_at: string;
+}
+
+export interface ConnectorRecord {
+  id: string;
+  name: string;
+  status: string;
+  detail: string;
+  documentation_url: string;
+  setup: string[];
+  secret_names: string[];
+}
+
+export interface SpatialLayer {
+  id: string;
+  title: string;
+  template: string;
+  /** @nullable */
+  legend: string | null;
+  /** @nullable */
+  start: string | null;
+  /** @nullable */
+  end: string | null;
+  /** @nullable */
+  default_date: string | null;
+  max_zoom: number;
+  attribution: string;
+  caveat: string;
+  documentation_url: string;
+}
+
+export interface SpatialCatalog {
+  retrieved_at: string;
+  layers: SpatialLayer[];
+}
+
 export type GetPowerMonthlyParams = {
 /**
  * @minimum -90

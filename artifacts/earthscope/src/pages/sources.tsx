@@ -1,17 +1,18 @@
 import { ExternalLink } from "lucide-react";
-import { getGetFoundationQueryKey, getGetIndicatorsQueryKey, useGetFoundation, useGetIndicators } from "@workspace/api-client-react";
+import { getGetFoundationQueryKey, getGetIndicatorsQueryKey, getGetResearchConnectorsQueryKey, useGetFoundation, useGetIndicators, useGetResearchConnectors } from "@workspace/api-client-react";
 import { ErrorPanel, Panel, StatusTag } from "@/components/status";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Sources() {
   const f = useGetFoundation({ query: { queryKey: getGetFoundationQueryKey() } });
+  const con = useGetResearchConnectors({ query: { queryKey: getGetResearchConnectorsQueryKey() } });
   const ind = useGetIndicators({ query: { queryKey: getGetIndicatorsQueryKey() } });
   return (
     <div className="mx-auto max-w-[1200px] space-y-3 p-3 md:p-5">
       <header className="es-rise">
         <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-accent">Integration catalog</div>
         <h1 className="font-serif text-2xl md:text-3xl">Data sources, as they actually stand</h1>
-        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">Status is reported by the backend. Nothing here can be connected from the interface; integrations are implemented and validated server-side in Phase 2.</p>
+        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">Status is reported by the backend; nothing can be connected from the browser. Working research sources (NASA POWER, NOAA CO2, World Bank forest, NASA GIBS imagery, NASA FIRMS public MODIS detections) are listed under Research connectors and used on the Research and Explorer pages. The legacy indicator registry below still lists indicators pending in the original workspace.</p>
       </header>
       <Panel label="Sources" right={f.data && <span className="font-mono text-[10px] text-muted-foreground">{f.data.sources.length} listed</span>}>
         {f.isLoading ? <div className="space-y-2">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-14" />)}</div> : f.isError ? (
@@ -27,6 +28,29 @@ export default function Sources() {
                 <div className="flex items-center gap-3 sm:flex-col sm:items-end">
                   <StatusTag status={s.status} />
                   {s.url && <a href={s.url} target="_blank" rel="noreferrer" data-testid={`link-source-${s.id}`} className="inline-flex items-center gap-1 text-xs text-primary hover:underline">Provider docs <ExternalLink className="h-3 w-3" /></a>}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Panel>
+      <Panel label="Research connectors" right={con.data && <span className="font-mono text-[10px] text-muted-foreground">{con.data.length} reported</span>}>
+        <p className="mb-2 text-xs text-muted-foreground">Status comes from server-side configuration checks. "Implemented" means an adapter exists in code; "credentials missing" means it needs secrets set by an operator; "documented only" means no adapter yet. None of this asserts a live cloud connection.</p>
+        {con.isLoading ? <div className="space-y-2">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-14" />)}</div> : con.isError ? (
+          <ErrorPanel title="Could not load research connectors" error={con.error} onRetry={() => con.refetch()} retrying={con.isFetching} />
+        ) : !con.data?.length ? <p className="py-6 text-center text-sm text-muted-foreground">No connectors reported.</p> : (
+          <div className="divide-y">
+            {con.data.map((c) => (
+              <div key={c.id} data-testid={`row-connector-${c.id}`} className="flex flex-col gap-2 py-3 sm:flex-row sm:items-start sm:gap-4">
+                <div className="sm:w-56 sm:shrink-0"><div className="font-medium">{c.name}</div><div className="font-mono text-[10px] text-muted-foreground">{c.id}</div></div>
+                <div className="flex-1 space-y-1.5 text-sm">
+                  <p className="text-muted-foreground">{c.detail}</p>
+                  {c.setup.length > 0 && <ol className="list-decimal space-y-0.5 pl-4 text-xs">{c.setup.map((st, i) => <li key={i}>{st}</li>)}</ol>}
+                  {c.secret_names.length > 0 && <div className="flex flex-wrap gap-1">{c.secret_names.map((n) => <code key={n} className="rounded-sm border bg-muted px-1 font-mono text-[10px]">{n}</code>)}</div>}
+                </div>
+                <div className="flex items-center gap-3 sm:flex-col sm:items-end">
+                  <StatusTag status={c.status} />
+                  {/^https?:\/\//.test(c.documentation_url) && <a href={c.documentation_url} target="_blank" rel="noreferrer" data-testid={`link-connector-${c.id}`} className="inline-flex items-center gap-1 text-xs text-primary hover:underline">Docs <ExternalLink className="h-3 w-3" /></a>}
                 </div>
               </div>
             ))}

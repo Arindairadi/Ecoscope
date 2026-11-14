@@ -6,16 +6,37 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './analysisResult';
+export * from './anomalyValue';
+export * from './comparisonResult';
+export * from './comparisonRow';
+export * from './connectorRecord';
+export * from './fireDataset';
+export * from './fireInput';
+export * from './fireInputSource';
+export * from './firePoint';
 export * from './foundation';
 export * from './getPowerMonthlyParams';
 export * from './getSeriesParams';
 export * from './healthStatus';
 export * from './indicator';
 export * from './integration';
+export * from './methodResult';
 export * from './monthlyValue';
 export * from './observation';
 export * from './observationKind';
 export * from './powerSeries';
 export * from './powerSeriesStatus';
 export * from './region';
+export * from './researchDataset';
+export * from './researchDatasetFrequency';
+export * from './researchInput';
+export * from './researchResult';
+export * from './researchSelection';
+export * from './researchSelectionIndicator';
+export * from './researchSelectionSource';
+export * from './researchValue';
+export * from './seasonalMonth';
 export * from './series';
+export * from './spatialCatalog';
+export * from './spatialLayer';
