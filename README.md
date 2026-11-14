@@ -1,55 +1,154 @@
-# Ecoscope — Earth System Trend Detective
+#  Ecoscope
 
-The product is **Ecoscope**, with the tagline “See the Planet. Detect the Trends. Understand the Change.” Existing package names, artifact IDs, directory paths and workflow identifiers are retained for compatibility. The app's Replit artifact display title is Ecoscope. To change the workspace-level project name separately, click the app name in Replit's interface and edit it to **Ecoscope**; this does not require publishing.
+### See the Planet. Detect the Trends. Understand the Change.
 
-**See the Planet. Detect the Trends. Understand the Change.**
+**Ecoscope** is an environmental intelligence and climate monitoring platform designed to make environmental data accessible, understandable, and actionable.
 
-## Current scope
+The project aims to combine scientific environmental datasets, interactive visualizations, geospatial analytics, and artificial intelligence to help users monitor environmental changes, understand climate trends, and make informed decisions.
 
-The React dashboard calls a real Python FastAPI REST backend. The first Phase 2 increment adds **NASA POWER monthly T2M point estimates** with provenance, gaps, summaries and a dataset download. It is not a finished environmental analytics platform: other sources, trend inference and external database connections remain pending. No credentials are needed for the foundation or this NASA POWER adapter.
+##  Our Mission
 
-The OpenStreetMap basemap is geographic context, **not environmental evidence**. Public tiles require internet access, may be unavailable or rate-limited, and carry visible attribution. Country presets are viewport centers, not authoritative boundary polygons. Uganda is included.
+To empower individuals, researchers, organizations, and policymakers with data-driven environmental insights that support climate action, environmental sustainability, and informed decision-making.
 
-## Start in Replit
+##  Key Features
 
-Use the configured **API Server** and **Ecoscope web** workflows, then open the Ecoscope preview. The Canvas workflow is unused scaffold and is not needed. One shared project holds the frontend and backend. Technical package names, paths and workflow identifiers are unchanged.
+Ecoscope is designed around the following capabilities:
 
-For a fresh checkout, Python 3.12+ and Node/pnpm are needed:
+###  1. Environmental Monitoring
+- Monitor environmental conditions and changes.
+- Explore climate and environmental indicators.
+- Identify trends across geographical regions.
+- Support environmental awareness and research.
 
-```sh
-corepack enable
-pnpm install --frozen-lockfile
-uv sync --frozen
-# Two terminals; Replit workflows already supply PORT and BASE_PATH:
-PORT=8080 uv run python -m backend.run
-PORT=5173 BASE_PATH=/ pnpm --filter @workspace/earthscope run dev
+###  2. Interactive Maps
+- Visualize environmental data geographically.
+- Explore environmental patterns across locations.
+- Compare regional environmental indicators.
+- Identify areas experiencing environmental challenges.
+
+###  3. Data Analytics and Visualization
+- Explore environmental datasets through dashboards.
+- Analyze historical trends and changing patterns.
+- Present complex information through understandable charts.
+- Support evidence-based environmental decisions.
+
+###  4. AI-Powered Environmental Insights
+- Explore the use of artificial intelligence for environmental analysis.
+- Identify patterns and anomalies in environmental data.
+- Generate accessible interpretations of complex datasets.
+- Support informed climate-related decision-making.
+
+###  5. Sustainability and Climate Awareness
+- Promote environmental education.
+- Encourage sustainable practices.
+- Support climate change awareness.
+- Contribute to data-driven environmental initiatives.
+
+##  Who Can Use Ecoscope?
+
+Ecoscope is intended for:
+
+- **Researchers:** Exploring environmental trends and scientific datasets.
+- **Students and educators:** Learning about climate science and sustainability.
+- **Environmental organizations:** Understanding environmental challenges.
+- **Policymakers:** Supporting evidence-based planning.
+- **Communities:** Accessing understandable environmental information.
+- **Climate innovators:** Developing sustainable and data-driven solutions.
+
+##  Project Architecture
+
+Ecoscope is envisioned around four major components:
+
+1. **Data Collection:** Integration of environmental and scientific data sources.
+2. **Data Processing:** Cleaning, organizing, and analyzing datasets.
+3. **Intelligence Layer:** Statistical analysis and AI-assisted insights.
+4. **Visualization Layer:** Interactive maps, dashboards, and environmental reports.
+
+Specific technologies and integrations will be documented according to the project's implementation.
+
+##  Getting Started
+
+### Clone the Repository
+
+Once the project is pushed to GitHub, clone it using:
+
+```bash
+git clone https://github.com/iradi2222/Ecoscope.git
 ```
 
-The local two-terminal commands start separate services. Replit's shared proxy supplies `/` → frontend and `/api` → backend. Outside Replit, configure a same-origin reverse proxy with those routes; do not expose credentials or hardcode service origins into the browser. Do not start a second server on ports already owned by a workflow.
+Navigate to the project directory:
 
-Interactive API docs: `/api/docs`; runtime OpenAPI: `/api/openapi.json`.
-
-## Checks
-
-Run at the repository root:
-
-```sh
-uv run python -m pytest backend/tests -q
-pnpm run typecheck
-uv run python -c 'from backend.services.science import scientific_versions; print(scientific_versions())'
-curl --fail http://localhost:80/api/healthz
-curl --fail 'http://localhost:80/api/series?region=uganda&indicator=temperature&start=2015-01-01&end=2025-12-31'
+```bash
+cd Ecoscope
 ```
 
+### Installation and Running
 
+Installation requirements and startup instructions depend on the application's technology stack and configuration.
 
-## Documentation
+The project is being developed using Replit. For access to the development environment, open the project in Replit and follow the configured run workflow.
 
-- [Architecture and dependencies](docs/ARCHITECTURE.md)
-- [Phase roadmap and scientific acceptance gates](docs/PHASES.md)
-- [Team collaboration and GitHub authorization](docs/COLLABORATION.md)
-- [Publishing runbook](docs/DEPLOYMENT.md)
-- [Verification results](docs/VERIFICATION.md)
-- [NASA POWER source verification and integration semantics](docs/NASA_POWER.md)
+**Important:** Never commit passwords, API keys, environment secrets, or private credentials to the repository.
 
+##  Future Roadmap
 
+- [ ] Expand environmental data integrations.
+- [ ] Improve interactive climate visualizations.
+- [ ] Develop advanced environmental trend analysis.
+- [ ] Strengthen AI-assisted environmental insights.
+- [ ] Introduce downloadable environmental reports.
+- [ ] Support additional geographic regions.
+- [ ] Improve accessibility and mobile responsiveness.
+- [ ] Explore collaboration with environmental organizations.
+
+##  Sustainable Development Goals
+
+Ecoscope aims to contribute toward the United Nations Sustainable Development Goals, particularly:
+
+- **SDG 13:** Climate Action
+- **SDG 11:** Sustainable Cities and Communities
+- **SDG 12:** Responsible Consumption and Production
+- **SDG 15:** Life on Land
+- **SDG 17:** Partnerships for the Goals
+
+##  Contributions
+
+Contributions, ideas, and feedback are welcome.
+
+To contribute:
+
+1. Fork the repository.
+2. Create a new feature branch.
+3. Implement and test your changes.
+4. Commit your changes.
+5. Submit a pull request explaining your contribution.
+
+Please ensure that contributions support the project's environmental sustainability and data accessibility objectives.
+
+##  Data Reliability
+
+Ecoscope aims to use credible environmental and scientific datasets. The accuracy, completeness, and timeliness of insights depend on the underlying data sources.
+
+AI-generated interpretations should be reviewed and should not replace official scientific measurements or professional environmental assessments.
+
+##  License
+
+A project license has not yet been specified. Please check the repository for an applicable `LICENSE` file before reusing or distributing project code.
+
+##  Project Maintainer
+
+**GitHub:** [@iradi2222](https://github.com/arindairadi)
+
+**Project:** Ecoscope
+
+##  Our Vision
+
+We envision a future where environmental data is not limited to scientists and technical experts, but is accessible to everyone.
+
+Through technology, data analytics, and environmental intelligence, Ecoscope seeks to turn complex environmental information into knowledge that inspires awareness, innovation, and meaningful action.
+
+---
+
+###  Ecoscope — Turning Environmental Data into Actionable Insights.
+
+*Built with a commitment to environmental sustainability, climate awareness, and technology-driven innovation.*
