@@ -1,1 +1,0 @@
-- [Browser runtime verification](browser-runtime.md) — provisioned Playwright and Chromium can have mismatched default versions; use the installed executable explicitly.

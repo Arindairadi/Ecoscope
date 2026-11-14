@@ -38,13 +38,13 @@ Playwright results are written under ignored `generated-artifacts/`. Browser che
 
 ## Product rename to Ecoscope — 2026-11-14
 
-- Updated desktop/mobile branding, browser title, description, Open Graph/Twitter metadata, API display names, project documentation and the Replit artifact display title to **Ecoscope**. Preserved the full tagline.
+- Updated desktop/mobile branding, browser title, description, Open Graph/Twitter metadata, API display names, project documentation to **Ecoscope**. Preserved the full tagline.
 - Kept package names, directory paths, artifact IDs, routes, API field names and workflow identifiers unchanged. The source-specific JSON export has no old product branding and its data format is unchanged.
 - Reran **54 backend tests**, the full workspace TypeScript check and the frontend production build: passed. Existing deprecation, sourcemap and bundle-size warnings remain non-blocking.
 - Reran the browser integration suite: **12 groups passed**, no page errors. Added assertions for the exact browser title, product metadata, visible branding and accessible text; also exercised mobile branding and the existing real NASA chart/download flow.
 - Rechecked all 24 displayed Kampala months against a fresh NASA response; the app retrieval timestamp for this run was **2026-11-14T07:51:40.997547Z**.
 - Screenshot confirmed the updated visible brand and FastAPI service label. Remaining old-name matches are compatibility identifiers/paths and negative regression assertions, not visible product branding.
-- Workspace-level project-name editing is a separate Replit UI action: click the app name and change it to **Ecoscope**. Only the artifact display title was changed programmatically. Nothing was published.
+- Nothing was published.
 
 ## Latest increment — NASA POWER monthly T2M, 2026-11-14
 

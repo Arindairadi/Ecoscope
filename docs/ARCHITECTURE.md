@@ -59,7 +59,7 @@ Missing values stay `null`, never zero. Empty results mean unavailable data, not
 
 ## Security and persistence
 
-No secrets are required or returned. Do not access or print existing workspace secrets. Future external credentials belong in server-side Replit Secrets, never `VITE_*`, browser storage, source code, logs, screenshots or GitHub. Use least-privilege database credentials, parameterized queries and restricted access policies.
+No secrets are required or returned. Do not access or print existing workspace secrets. Future external credentials belong in server-side environment variables, never `VITE_*`, browser storage, source code, logs, screenshots or GitHub. Use least-privilege database credentials, parameterized queries and restricted access policies.
 
 The API is read-only and has no user accounts, shared saved analyses or durable scientific storage. The NASA POWER response cache is bounded, process-local memory with original retrieval timestamps, not persistent storage. Theme preferences may be stored in browser local storage; this is not collaborative persistence. Add authentication and authorization before enabling write operations or private data.
 

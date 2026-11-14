@@ -63,7 +63,7 @@ async def fire_detections(body:FireInput):
     if body.source=="firms_viirs":
         key=os.environ.get("FIRMS_MAP_KEY","").strip()
         if not key:
-            raise PowerError("Optional FIRMS VIIRS API is blocked: add your free FIRMS_MAP_KEY in Replit Secrets. Public MODIS 24h remains available.",503)
+            raise PowerError("Optional FIRMS VIIRS API is blocked: add your free FIRMS_MAP_KEY as a server-side environment variable. Public MODIS 24h remains available.",503)
         if not re.fullmatch(r"[A-Za-z0-9_-]{16,128}",key):
             raise PowerError("FIRMS_MAP_KEY configuration is invalid; no upstream request sent.",503)
         bbox=f"{body.west},{body.south},{body.east},{body.north}"

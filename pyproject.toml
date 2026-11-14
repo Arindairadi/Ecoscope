@@ -1,9 +1,9 @@
 [project]
-name = "repl-nix-workspace"
+name = "ecoscope"
 version = "0.1.0"
 description = "Add your description here"
 authors = [
-    { name = "iradi2222", email = "67781549-iradi2222@users.noreply.replit.com" }
+    { name = "Arinda Iradi" }
 ]
 requires-python = ">=3.12"
 dependencies = [
@@ -25,7 +25,7 @@ dependencies = [
 ]
 
 [project.scripts]
-repl-nix-workspace = "repl_nix_workspace:main"
+ecoscope = "ecoscope:main"
 
 [build-system]
 requires = ["uv_build>=0.13.4,<0.14.0"]

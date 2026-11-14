@@ -86,8 +86,6 @@ cd Ecoscope
 
 Installation requirements and startup instructions depend on the application's technology stack and configuration.
 
-The project is being developed using Replit. For access to the development environment, open the project in Replit and follow the configured run workflow.
-
 **Important:** Never commit passwords, API keys, environment secrets, or private credentials to the repository.
 
 ##  Future Roadmap
@@ -137,7 +135,7 @@ A project license has not yet been specified. Please check the repository for an
 
 ##  Project Maintainer
 
-**GitHub:** [@iradi2222](https://github.com/arindairadi)
+**GitHub:** [@Arindairadi](https://github.com/Arindairadi)
 
 **Project:** Ecoscope
 
