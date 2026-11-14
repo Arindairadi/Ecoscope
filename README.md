@@ -103,9 +103,26 @@ All settings are optional environment variables on the server (never in browser 
 | Variable | Purpose |
 |---|---|
 | `FIRMS_MAP_KEY` | Free NASA FIRMS key for the VIIRS fire layer |
+| `AI_PROVIDER` | `anthropic` (default) or `gemini`; selects exactly one provider |
+| `GEMINI_API_KEY` | Server-side Google Gemini API key, required when using Gemini |
+| `GEMINI_MODEL` | Required Gemini model ID available to your Google AI Studio project, without the `models/` prefix |
 | `ANTHROPIC_API_KEY` | Turns on the optional AI plain-language explanations (usage is billed to that key) |
 | `ANTHROPIC_MODEL` | Model for those explanations (default `claude-haiku-5-5`) |
 | `AI_EXPLAIN_PER_HOUR`, `AI_EXPLAIN_PER_DAY` | Usage caps per visitor and overall (defaults 10 and 300) |
+
+To activate Gemini on Render, add `AI_PROVIDER=gemini`, `GEMINI_API_KEY`, and
+`GEMINI_MODEL` in the service's **Environment** settings, then redeploy the branch
+containing Gemini support. Create the key and select an available text-generation
+model in [Google AI Studio](https://aistudio.google.com/). Never put the key in
+GitHub, frontend variables, or chat. Usage is charged or limited according to your
+Google project. The existing caps are per server process, reset on restart, and
+are not an account-level spending limit.
+
+After deployment, run a Research analysis, select **Plain-language AI explanation**,
+and ask a question. A successful accepted answer reports `ai_grounded_numbers_verified`.
+Missing configuration, upstream errors, blocked/truncated output, or a failed
+number check retain the rule-based answer and report `ai_unavailable`. The number
+check is a limited safeguard, not verification of every scientific claim.
 
 ##  Still to do
 
