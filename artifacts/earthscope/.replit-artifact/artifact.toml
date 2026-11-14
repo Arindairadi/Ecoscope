@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "EARTHSCOPE"
+description = "Earth System Trend Detective — a scientific environmental analysis foundation with real FastAPI connectivity and honest integration states."
+version = "1.0.0"
+id = "artifacts/earthscope"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23026
+
+[services.development]
+run = "pnpm --filter @workspace/earthscope run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/earthscope", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/earthscope/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23026"
+BASE_PATH = "/"

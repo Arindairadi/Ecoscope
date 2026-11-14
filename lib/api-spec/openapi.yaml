@@ -1,36 +1,130 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: EARTHSCOPE Phase 1 foundation. No scientific observations are connected.
 servers:
   - url: /api
-    description: Base API path
-tags:
-  - name: health
-    description: Health operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
-      tags: [health]
-      summary: Health check
-      description: Returns server health status
       responses:
         "200":
-          description: Healthy
+          description: Live backend health
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/HealthStatus"
+              schema: { $ref: "#/components/schemas/HealthStatus" }
+  /foundation:
+    get:
+      operationId: getFoundation
+      responses:
+        "200":
+          description: Runtime and integration status
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Foundation" }
+  /regions:
+    get:
+      operationId: getRegions
+      responses:
+        "200":
+          description: Geographic presets, not scientific data
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/Region" } }
+  /indicators:
+    get:
+      operationId: getIndicators
+      responses:
+        "200":
+          description: Planned indicator catalog
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/Indicator" } }
+  /series:
+    get:
+      operationId: getSeries
+      parameters:
+        - { name: region, in: query, required: true, schema: { type: string } }
+        - { name: indicator, in: query, required: true, schema: { type: string } }
+        - { name: start, in: query, required: true, schema: { type: string, format: date } }
+        - { name: end, in: query, required: true, schema: { type: string, format: date } }
+      responses:
+        "200":
+          description: Explicit empty result until a scientific adapter is connected
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Series" }
+        "422":
+          description: Invalid selection
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status, service, timestamp]
       properties:
-        status:
-          type: string
-      required:
-        - status
-
+        status: { type: string }
+        service: { type: string }
+        timestamp: { type: string, format: date-time }
+    Integration:
+      type: object
+      required: [id, name, status, detail, url]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        status: { type: string }
+        detail: { type: string }
+        url: { type: string }
+    Foundation:
+      type: object
+      required: [phase, backend, database, scientificData, sources, capabilities]
+      properties:
+        phase: { type: string }
+        backend: { type: string }
+        database: { type: string }
+        scientificData: { type: string }
+        sources: { type: array, items: { $ref: "#/components/schemas/Integration" } }
+        capabilities: { type: array, items: { type: string } }
+    Region:
+      type: object
+      required: [id, name, latitude, longitude, zoom, description]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        latitude: { type: number }
+        longitude: { type: number }
+        zoom: { type: integer }
+        description: { type: string }
+    Indicator:
+      type: object
+      required: [id, name, unit, category, status, description]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        unit: { type: string }
+        category: { type: string }
+        status: { type: string }
+        description: { type: string }
+    Observation:
+      type: object
+      required: [timestamp, value, unit, source, retrievedAt, kind]
+      properties:
+        timestamp: { type: string, format: date-time }
+        value: { type: ["number", "null"] }
+        unit: { type: string }
+        source: { type: string }
+        retrievedAt: { type: string, format: date-time }
+        kind: { type: string, enum: [observation, modelled_estimate, forecast, demonstration] }
+    Series:
+      type: object
+      required: [status, message, region, indicator, start, end, unit, observations]
+      properties:
+        status: { type: string }
+        message: { type: string }
+        region: { type: string }
+        indicator: { type: string }
+        start: { type: string }
+        end: { type: string }
+        unit: { type: string }
+        observations: { type: array, items: { $ref: "#/components/schemas/Observation" } }

@@ -1,45 +1,32 @@
-# [Project name]
+# EARTHSCOPE — Earth System Trend Detective
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+See the Planet. Detect the Trends. Understand the Change.
 
-## Run & Operate
+## Scope and scientific integrity
+- Build incrementally. Phase 1 is the connected environment foundation, not a finished platform.
+- Never fabricate environmental measurements, statistics, charts, successful connections, tests or causal claims.
+- Scientific data, Supabase/PostGIS, trend engine, explanations and reports remain pending.
+- User prefers free external services. Do not upgrade, buy add-ons or provision optional paid services.
+- Keep all credentials server-side. No credentials are needed for Phase 1.
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+## Run and check
+- Managed `artifacts/api-server: API Server` workflow invokes `pnpm --filter @workspace/api-server run dev`, which starts Python FastAPI via `backend.run`.
+- Managed `artifacts/earthscope: web` workflow invokes `pnpm --filter @workspace/earthscope run dev`.
+- API `/api`, dashboard `/`; both use managed `PORT`; frontend also uses `BASE_PATH`.
+- `uv sync --frozen` installs Python dependencies; `pnpm install --frozen-lockfile` installs JavaScript dependencies.
+- `uv run python -m pytest backend/tests -q`
+- `pnpm run typecheck`
+- `pnpm --filter @workspace/api-spec run codegen` after each contract change.
+- API docs `/api/docs`; health `/api/healthz`.
+- No database required. Unused Express/Drizzle scaffold is not the running backend.
 
-## Stack
+## Code and team
+- Frontend: `artifacts/earthscope/src/`; backend: `backend/`; shared contract: `lib/api-spec/openapi.yaml`.
+- Python dependency lock: `uv.lock`; JS dependency lock: `pnpm-lock.yaml`.
+- Keep one shared project and one canonical GitHub repository.
+- Never switch branches in a working tree teammates are editing concurrently.
+- Independent PR branches require isolated working trees/clones; review before merge.
+- GitHub connection and teammate invitations require owner authorization; do not claim them completed without verification.
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
-
-## Where things live
-
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
-
-## Architecture decisions
-
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
-
-## Product
-
-_Describe the high-level user-facing capabilities of this app once they exist._
-
-## User preferences
-
-_Populate as you build — explicit user instructions worth remembering across sessions._
-
-## Gotchas
-
-_Populate as you build — sharp edges, "always run X before Y" rules._
-
-## Pointers
-
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+## Documentation
+- `README.md`, `docs/ARCHITECTURE.md`, `docs/PHASES.md`, `docs/COLLABORATION.md`, `docs/DEPLOYMENT.md`, `docs/VERIFICATION.md`.
