@@ -1,0 +1,857 @@
+From 271f918a58410622f61956e3167128dc21b7e3d4 Mon Sep 17 00:00:00 2001
+From: Arinda Iradi <151714474+Arindairadi@users.noreply.github.com>
+Date: Sat, 14 Nov 2026 11:55:00 +0000
+Subject: [PATCH] Remove Replit-specific files, configuration and references
+
+---
+ .agents/memory/MEMORY.md                      |  1 -
+ .agents/memory/browser-runtime.md             | 10 ---
+ .gitignore                                    |  4 --
+ .replit                                       | 24 -------
+ .replitignore                                 |  9 ---
+ README.md                                     |  4 +-
+ .../api-server/.replit-artifact/artifact.toml | 25 --------
+ .../earthscope/.replit-artifact/artifact.toml | 28 --------
+ artifacts/earthscope/package.json             |  3 -
+ .../earthscope/src/components/ui/badge.tsx    |  9 ++-
+ .../earthscope/src/components/ui/button.tsx   | 10 +--
+ artifacts/earthscope/vite.config.ts           | 16 -----
+ .../.replit-artifact/artifact.toml            | 17 -----
+ artifacts/mockup-sandbox/package.json         |  2 -
+ artifacts/mockup-sandbox/vite.config.ts       | 12 ----
+ backend/services/connectors.py                |  6 +-
+ backend/services/fires.py                     |  2 +-
+ docs/ARCHITECTURE.md                          |  2 +-
+ docs/COLLABORATION.md                         | 64 -------------------
+ docs/DEPLOYMENT.md                            | 12 ++--
+ docs/VERIFICATION.md                          |  4 +-
+ package.json                                  |  3 -
+ pnpm-lock.yaml                                | 63 ------------------
+ pnpm-workspace.yaml                           | 13 +---
+ pyproject.toml                                |  6 +-
+ replit.md                                     | 33 ----------
+ scripts/post-merge.sh                         |  4 --
+ src/ecoscope/__init__.py                      |  2 +
+ src/repl_nix_workspace/__init__.py            |  2 -
+ uv.lock                                       |  2 +-
+ 30 files changed, 30 insertions(+), 362 deletions(-)
+ delete mode 100644 .agents/memory/MEMORY.md
+ delete mode 100644 .agents/memory/browser-runtime.md
+ delete mode 100644 .replit
+ delete mode 100644 .replitignore
+ delete mode 100644 artifacts/api-server/.replit-artifact/artifact.toml
+ delete mode 100644 artifacts/earthscope/.replit-artifact/artifact.toml
+ delete mode 100644 artifacts/mockup-sandbox/.replit-artifact/artifact.toml
+ delete mode 100644 docs/COLLABORATION.md
+ delete mode 100644 replit.md
+ delete mode 100644 scripts/post-merge.sh
+ create mode 100644 src/ecoscope/__init__.py
+ delete mode 100644 src/repl_nix_workspace/__init__.py
+
+diff --git a/.agents/memory/MEMORY.md b/.agents/memory/MEMORY.md
+deleted file mode 100644
+index a330819..0000000
+--- a/.agents/memory/MEMORY.md
++++ /dev/null
+@@ -1 +0,0 @@
+-- [Browser runtime verification](browser-runtime.md) — provisioned Playwright and Chromium can have mismatched default versions; use the installed executable explicitly.
+diff --git a/.agents/memory/browser-runtime.md b/.agents/memory/browser-runtime.md
+deleted file mode 100644
+index 2df6bdf..0000000
+--- a/.agents/memory/browser-runtime.md
++++ /dev/null
+@@ -1,10 +0,0 @@
+----
+-name: Browser runtime verification
+-description: Why real browser tests may require an explicit provisioned Chromium executable.
+----
+-
+-When using the environment-provided Playwright module, select the provisioned Chromium executable explicitly if its default browser cannot be found. Do not assume a missing default executable means browser testing is unavailable or download another browser immediately.
+-
+-**Why:** The provisioned module expected an older browser revision than the Chromium already installed in this environment. Pointing it at the existing executable enabled real interaction checks without adding application dependencies.
+-
+-**How to apply:** Locate the currently installed module and executable instead of relying on versioned paths from an earlier session. Use the test scripts' module/executable environment options when needed; keep environment-specific paths out of application runtime code.
+diff --git a/.gitignore b/.gitignore
+index 9ea7184..6419d29 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -50,10 +50,6 @@ Thumbs.db
+ .cursor/rules/nx-rules.mdc
+ .github/instructions/nx.instructions.md
+ 
+-# Replit
+-.cache/
+-.local/
+-.pythonlibs/
+ __pycache__/
+ *.py[cod]
+ .pytest_cache/
+diff --git a/.replit b/.replit
+deleted file mode 100644
+index 1c4ec48..0000000
+--- a/.replit
++++ /dev/null
+@@ -1,24 +0,0 @@
+-modules = ["nodejs-24", "python-3.12"]
+-
+-[deployment]
+-router = "application"
+-deploymentTarget = "autoscale"
+-
+-[deployment.postBuild]
+-args = ["pnpm", "store", "prune"]
+-env = { "CI" = "true" }
+-
+-[workflows]
+-runButton = "Project"
+-
+-[agent]
+-stack = "PNPM_WORKSPACE"
+-expertMode = true
+-
+-[postMerge]
+-path = "scripts/post-merge.sh"
+-timeoutMs = 20000
+-
+-[nix]
+-channel = "stable-25_05"
+-packages = ["glibcLocales", "libxcrypt", "libyaml", "pkg-config", "xsimd"]
+diff --git a/.replitignore b/.replitignore
+deleted file mode 100644
+index 39bc502..0000000
+--- a/.replitignore
++++ /dev/null
+@@ -1,9 +0,0 @@
+-# The format of this file is identical to `.dockerignore`.
+-# It is used to reduce the size of deployed images to make the process of publishing faster.
+-
+-# No need to store the pnpm store twice.
+-.local
+-/generated-artifacts/
+-.pytest_cache/
+-__pycache__/
+-.pythonlibs/
+diff --git a/README.md b/README.md
+index a0d1b46..63ba618 100644
+--- a/README.md
++++ b/README.md
+@@ -86,8 +86,6 @@ cd Ecoscope
+ 
+ Installation requirements and startup instructions depend on the application's technology stack and configuration.
+ 
+-The project is being developed using Replit. For access to the development environment, open the project in Replit and follow the configured run workflow.
+-
+ **Important:** Never commit passwords, API keys, environment secrets, or private credentials to the repository.
+ 
+ ##  Future Roadmap
+@@ -137,7 +135,7 @@ A project license has not yet been specified. Please check the repository for an
+ 
+ ##  Project Maintainer
+ 
+-**GitHub:** [@iradi2222](https://github.com/arindairadi)
++**GitHub:** [@Arindairadi](https://github.com/Arindairadi)
+ 
+ **Project:** Ecoscope
+ 
+diff --git a/artifacts/api-server/.replit-artifact/artifact.toml b/artifacts/api-server/.replit-artifact/artifact.toml
+deleted file mode 100644
+index f5918f8..0000000
+--- a/artifacts/api-server/.replit-artifact/artifact.toml
++++ /dev/null
+@@ -1,25 +0,0 @@
+-kind = "api"
+-previewPath = "/api"
+-title = "API Server"
+-version = "1.0.0"
+-id = "3B4_FFSkEVBkAeYMFRJ2e"
+-
+-[[services]]
+-localPort = 8080
+-name = "API Server"
+-paths = ["/api"]
+-
+-[services.development]
+-run = "pnpm --filter @workspace/api-server run dev"
+-
+-[services.production.build]
+-args = ["pnpm", "--filter", "@workspace/api-server", "run", "build"]
+-
+-[services.production.run]
+-args = ["python", "-m", "backend.run"]
+-
+-[services.production.run.env]
+-PORT = "8080"
+-
+-[services.production.health.startup]
+-path = "/api/healthz"
+diff --git a/artifacts/earthscope/.replit-artifact/artifact.toml b/artifacts/earthscope/.replit-artifact/artifact.toml
+deleted file mode 100644
+index 2a4d3d5..0000000
+--- a/artifacts/earthscope/.replit-artifact/artifact.toml
++++ /dev/null
+@@ -1,28 +0,0 @@
+-kind = "web"
+-previewPath = "/"
+-title = "Ecoscope"
+-description = "Earth System Trend Detective — a scientific environmental analysis foundation with real FastAPI connectivity and honest integration states."
+-version = "1.0.0"
+-id = "artifacts/earthscope"
+-router = "path"
+-
+-[[services]]
+-name = "web"
+-paths = [ "/" ]
+-localPort = 23026
+-
+-[services.development]
+-run = "pnpm --filter @workspace/earthscope run dev"
+-
+-[services.production]
+-build = [ "pnpm", "--filter", "@workspace/earthscope", "run", "build" ]
+-serve = "static"
+-publicDir = "artifacts/earthscope/dist/public"
+-
+-[[services.production.rewrites]]
+-from = "/*"
+-to = "/index.html"
+-
+-[services.env]
+-PORT = "23026"
+-BASE_PATH = "/"
+diff --git a/artifacts/earthscope/package.json b/artifacts/earthscope/package.json
+index 1a4b247..91e4a49 100644
+--- a/artifacts/earthscope/package.json
++++ b/artifacts/earthscope/package.json
+@@ -38,9 +38,6 @@
+     "@radix-ui/react-toggle": "^1.1.3",
+     "@radix-ui/react-toggle-group": "^1.1.3",
+     "@radix-ui/react-tooltip": "^1.2.0",
+-    "@replit/vite-plugin-cartographer": "catalog:",
+-    "@replit/vite-plugin-dev-banner": "catalog:",
+-    "@replit/vite-plugin-runtime-error-modal": "catalog:",
+     "@tailwindcss/typography": "^0.5.15",
+     "@tailwindcss/vite": "catalog:",
+     "@tanstack/react-query": "catalog:",
+diff --git a/artifacts/earthscope/src/components/ui/badge.tsx b/artifacts/earthscope/src/components/ui/badge.tsx
+index 4cd8053..5078533 100644
+--- a/artifacts/earthscope/src/components/ui/badge.tsx
++++ b/artifacts/earthscope/src/components/ui/badge.tsx
+@@ -3,7 +3,6 @@ import { cn } from '@/lib/utils';
+ import { cva, type VariantProps } from 'class-variance-authority';
+ 
+ const badgeVariants = cva(
+-  // @replit
+   // Whitespace-nowrap: Badges should never wrap.
+   'whitespace-nowrap inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2' +
+     ' hover-elevate ',
+@@ -11,15 +10,15 @@ const badgeVariants = cva(
+     variants: {
+       variant: {
+         default:
+-          // @replit shadow-xs instead of shadow, no hover because we use hover-elevate
++          // shadow-xs instead of shadow, no hover because we use hover-elevate
+           'border-transparent bg-primary text-primary-foreground shadow-xs',
+         secondary:
+-          // @replit no hover because we use hover-elevate
++          // no hover because we use hover-elevate
+           'border-transparent bg-secondary text-secondary-foreground',
+         destructive:
+-          // @replit shadow-xs instead of shadow, no hover because we use hover-elevate
++          // shadow-xs instead of shadow, no hover because we use hover-elevate
+           'border-transparent bg-destructive text-destructive-foreground shadow-xs',
+-        // @replit shadow-xs" - use badge outline variable
++        // shadow-xs" - use badge outline variable
+         outline: 'text-foreground border [border-color:var(--badge-outline)]',
+       },
+     },
+diff --git a/artifacts/earthscope/src/components/ui/button.tsx b/artifacts/earthscope/src/components/ui/button.tsx
+index 87508a5..cb1326d 100644
+--- a/artifacts/earthscope/src/components/ui/button.tsx
++++ b/artifacts/earthscope/src/components/ui/button.tsx
+@@ -10,24 +10,24 @@ const buttonVariants = cva(
+     variants: {
+       variant: {
+         default:
+-          // @replit: no hover, and add primary border
++          // no hover, and add primary border
+           'bg-primary text-primary-foreground border border-primary-border',
+         destructive:
+           'bg-destructive text-destructive-foreground shadow-sm border-destructive-border',
+         outline:
+-          // @replit Shows the background color of whatever card / sidebar / accent background it is inside of.
++          // Shows the background color of whatever card / sidebar / accent background it is inside of.
+           // Inherits the current text color. Uses shadow-xs. no shadow on active
+           // No hover state
+           ' border [border-color:var(--button-outline)] shadow-xs active:shadow-none ',
+         secondary:
+-          // @replit border, no hover, no shadow, secondary border.
++          // border, no hover, no shadow, secondary border.
+           'border bg-secondary text-secondary-foreground border border-secondary-border ',
+-        // @replit no hover, transparent border
++        // no hover, transparent border
+         ghost: 'border border-transparent',
+         link: 'text-primary underline-offset-4 hover:underline',
+       },
+       size: {
+-        // @replit changed sizes
++        // changed sizes
+         default: 'min-h-9 px-4 py-2',
+         sm: 'min-h-8 rounded-md px-3 text-xs',
+         lg: 'min-h-10 rounded-md px-8',
+diff --git a/artifacts/earthscope/vite.config.ts b/artifacts/earthscope/vite.config.ts
+index 82792ad..74f3691 100644
+--- a/artifacts/earthscope/vite.config.ts
++++ b/artifacts/earthscope/vite.config.ts
+@@ -3,8 +3,6 @@ import react from '@vitejs/plugin-react';
+ import tailwindcss from '@tailwindcss/vite';
+ import { defineConfig } from 'vite';
+ 
+-import runtimeErrorOverlay from '@replit/vite-plugin-runtime-error-modal';
+-
+ const rawPort = process.env.PORT;
+ 
+ if (!rawPort) {
+@@ -32,20 +30,6 @@ export default defineConfig({
+   plugins: [
+     react(),
+     tailwindcss(),
+-    runtimeErrorOverlay(),
+-    ...(process.env.NODE_ENV !== 'production' &&
+-    process.env.REPL_ID !== undefined
+-      ? [
+-          await import('@replit/vite-plugin-cartographer').then((m) =>
+-            m.cartographer({
+-              root: path.resolve(import.meta.dirname, '..'),
+-            }),
+-          ),
+-          await import('@replit/vite-plugin-dev-banner').then((m) =>
+-            m.devBanner(),
+-          ),
+-        ]
+-      : []),
+   ],
+   resolve: {
+     alias: {
+diff --git a/artifacts/mockup-sandbox/.replit-artifact/artifact.toml b/artifacts/mockup-sandbox/.replit-artifact/artifact.toml
+deleted file mode 100644
+index 8f94c25..0000000
+--- a/artifacts/mockup-sandbox/.replit-artifact/artifact.toml
++++ /dev/null
+@@ -1,17 +0,0 @@
+-kind = "design"
+-previewPath = "/__mockup"
+-title = "Canvas"
+-version = "1.0.0"
+-id = "XegfDyZt7HqfW2Bb8Ghoy"
+-
+-[[services]]
+-localPort = 8081
+-name = "Component Preview Server"
+-paths = ["/__mockup"]
+-
+-[services.env]
+-PORT = "8081"
+-BASE_PATH = "/__mockup"
+-
+-[services.development]
+-run = "pnpm --filter @workspace/mockup-sandbox run dev"
+diff --git a/artifacts/mockup-sandbox/package.json b/artifacts/mockup-sandbox/package.json
+index 835024f..826162f 100644
+--- a/artifacts/mockup-sandbox/package.json
++++ b/artifacts/mockup-sandbox/package.json
+@@ -38,8 +38,6 @@
+     "@radix-ui/react-toggle": "^1.1.19",
+     "@radix-ui/react-toggle-group": "^1.1.20",
+     "@radix-ui/react-tooltip": "^1.3.0",
+-    "@replit/vite-plugin-cartographer": "catalog:",
+-    "@replit/vite-plugin-runtime-error-modal": "catalog:",
+     "@tailwindcss/vite": "catalog:",
+     "@types/node": "catalog:",
+     "@types/react": "catalog:",
+diff --git a/artifacts/mockup-sandbox/vite.config.ts b/artifacts/mockup-sandbox/vite.config.ts
+index 4ed4310..3c5cd7d 100644
+--- a/artifacts/mockup-sandbox/vite.config.ts
++++ b/artifacts/mockup-sandbox/vite.config.ts
+@@ -2,7 +2,6 @@ import { defineConfig } from "vite";
+ import react from "@vitejs/plugin-react";
+ import tailwindcss from "@tailwindcss/vite";
+ import path from "path";
+-import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+ import { mockupPreviewPlugin } from "./mockupPreviewPlugin";
+ 
+ const rawPort = process.env.PORT;
+@@ -33,17 +32,6 @@ export default defineConfig({
+     mockupPreviewPlugin(),
+     react(),
+     tailwindcss(),
+-    runtimeErrorOverlay(),
+-    ...(process.env.NODE_ENV !== "production" &&
+-    process.env.REPL_ID !== undefined
+-      ? [
+-          await import("@replit/vite-plugin-cartographer").then((m) =>
+-            m.cartographer({
+-              root: path.resolve(import.meta.dirname, ".."),
+-            }),
+-          ),
+-        ]
+-      : []),
+   ],
+   resolve: {
+     alias: {
+diff --git a/backend/services/connectors.py b/backend/services/connectors.py
+index 5fdfe41..706a9dd 100644
+--- a/backend/services/connectors.py
++++ b/backend/services/connectors.py
+@@ -28,9 +28,9 @@ def connector_catalog():
+         ("firms_public","NASA FIRMS public MODIS 24h","public_adapter","Live public MODIS C6.1 NRT satellite detections without a key; bounded area selection. Not exhaustive fires, burned area or a validated fire-trend archive.","https://firms.modaps.eosdis.nasa.gov/active_fire/",[],[]),
+         ("firms","NASA FIRMS detections","configured_unverified" if configured("FIRMS_MAP_KEY") else "credentials_missing",
+          "Secure bounded VIIRS NOAA-20 hotspot connector implemented; live retrieval not verified without your free MAP_KEY. Satellite detections are not exhaustive fires or burned areas.",
+-         "https://firms.modaps.eosdis.nasa.gov/api/area/",["Request a free MAP_KEY at https://firms.modaps.eosdis.nasa.gov/api/map_key .","Add FIRMS_MAP_KEY in Replit Secrets, never in chat or browser code; restart API.","Use a small bounding box and 1–5 days in the explorer; verify response/provenance before research use."],["FIRMS_MAP_KEY"]),
++         "https://firms.modaps.eosdis.nasa.gov/api/area/",["Request a free MAP_KEY at https://firms.modaps.eosdis.nasa.gov/api/map_key .","Add FIRMS_MAP_KEY as a server-side environment variable, never in chat or browser code; restart API.","Use a small bounding box and 1–5 days in the explorer; verify response/provenance before research use."],["FIRMS_MAP_KEY"]),
+         ("supabase","Supabase / PostGIS",sbstatus,sbdetail,"https://supabase.com/docs/guides/database/postgres/row-level-security",
+-         ["Choose an existing or owner-created free Supabase project; no project has been provisioned by this app.","Apply docs/supabase.sql in its SQL editor; inspect RLS and enable authentication before any shared research integration.","Set SUPABASE_URL and SUPABASE_ANON_KEY in Replit Secrets. Never expose a service-role key.","Cloud research sync is not implemented or verified; local persistence is the working option."],["SUPABASE_URL","SUPABASE_ANON_KEY"]),
++         ["Choose an existing or owner-created free Supabase project; no project has been provisioned by this app.","Apply docs/supabase.sql in its SQL editor; inspect RLS and enable authentication before any shared research integration.","Set SUPABASE_URL and SUPABASE_ANON_KEY as server-side environment variables. Never expose a service-role key.","Cloud research sync is not implemented or verified; local persistence is the working option."],["SUPABASE_URL","SUPABASE_ANON_KEY"]),
+         ("earthdata","NASA Earthdata numeric satellite products","authorization_required","GIBS imagery works publicly. Numeric MODIS/Sentinel vegetation and scientific QA-mask raster processing are not implemented. Earthdata archives commonly require EDL registration/collection-specific access.","https://urs.earthdata.nasa.gov/documentation",
+          ["Register an Earthdata Login account, review collection access and citation terms.","Choose a product/region/time and processing pipeline before authorizing server access; do not send credentials in chat."],[]),
+         ("copernicus","Copernicus CDS / Sentinel","authorization_required","CDS ERA5 extraction and Sentinel numeric raster processing are not implemented. CDS token plus dataset-terms acceptance and/or CDSE OAuth registration are needed; processing quotas apply.",
+@@ -42,7 +42,7 @@ def connector_catalog():
+         ("llm","Generative language model","not_configured","Working explanation/Q&A is deterministic statistical/rule-based interpretation, not generative AI. No LLM provider is connected and no usage is billed.","https://platform.openai.com/docs",
+          ["Optional only: choose an approved provider and a budget before implementation. A secret alone will not enable ungrounded text generation."],[]),
+         ("github","Canonical GitHub repository","authorization_required","Local source control exists; GitHub repository authorization and push remain unverified.","https://docs.github.com/en/authentication",
+-         ["Open Replit Git pane; connect GitHub and authorize only the intended account/organization and repository.","Select/create one canonical repository, confirm origin and existing history before pushing.","Invite developers with non-admin write permissions where sufficient; require pull-request review before merging. See docs/COLLABORATION.md."],[]),
++         ["Connect GitHub and authorize only the intended account/organization and repository.","Select/create one canonical repository, confirm origin and existing history before pushing.","Invite developers with non-admin write permissions where sufficient; require pull-request review before merging."],[]),
+     ]
+     return [ConnectorRecord(id=id,name=name,status=status,detail=detail,documentation_url=url,setup=setup,secret_names=keys)
+             for id,name,status,detail,url,setup,keys in records]
+diff --git a/backend/services/fires.py b/backend/services/fires.py
+index fe2367b..56522f8 100644
+--- a/backend/services/fires.py
++++ b/backend/services/fires.py
+@@ -63,7 +63,7 @@ async def fire_detections(body:FireInput):
+     if body.source=="firms_viirs":
+         key=os.environ.get("FIRMS_MAP_KEY","").strip()
+         if not key:
+-            raise PowerError("Optional FIRMS VIIRS API is blocked: add your free FIRMS_MAP_KEY in Replit Secrets. Public MODIS 24h remains available.",503)
++            raise PowerError("Optional FIRMS VIIRS API is blocked: add your free FIRMS_MAP_KEY as a server-side environment variable. Public MODIS 24h remains available.",503)
+         if not re.fullmatch(r"[A-Za-z0-9_-]{16,128}",key):
+             raise PowerError("FIRMS_MAP_KEY configuration is invalid; no upstream request sent.",503)
+         bbox=f"{body.west},{body.south},{body.east},{body.north}"
+diff --git a/docs/ARCHITECTURE.md b/docs/ARCHITECTURE.md
+index 1a7be01..639e18e 100644
+--- a/docs/ARCHITECTURE.md
++++ b/docs/ARCHITECTURE.md
+@@ -59,7 +59,7 @@ Missing values stay `null`, never zero. Empty results mean unavailable data, not
+ 
+ ## Security and persistence
+ 
+-No secrets are required or returned. Do not access or print existing workspace secrets. Future external credentials belong in server-side Replit Secrets, never `VITE_*`, browser storage, source code, logs, screenshots or GitHub. Use least-privilege database credentials, parameterized queries and restricted access policies.
++No secrets are required or returned. Do not access or print existing workspace secrets. Future external credentials belong in server-side environment variables, never `VITE_*`, browser storage, source code, logs, screenshots or GitHub. Use least-privilege database credentials, parameterized queries and restricted access policies.
+ 
+ The API is read-only and has no user accounts, shared saved analyses or durable scientific storage. The NASA POWER response cache is bounded, process-local memory with original retrieval timestamps, not persistent storage. Theme preferences may be stored in browser local storage; this is not collaborative persistence. Add authentication and authorization before enabling write operations or private data.
+ 
+diff --git a/docs/COLLABORATION.md b/docs/COLLABORATION.md
+deleted file mode 100644
+index 743208c..0000000
+--- a/docs/COLLABORATION.md
++++ /dev/null
+@@ -1,64 +0,0 @@
+-# Shared team and canonical GitHub workflow
+-
+-## What exists now
+-
+-This is one shared Replit codebase. Git was already initialized. At foundation setup, no GitHub remote or authorized GitHub integration was available. A later inspection found an internal checkpoint/backup remote, **not a GitHub repository**. No GitHub repository was created, no account was connected, and no GitHub push or invitations were performed.
+-
+-## Connect GitHub manually
+-
+-1. The repository owner signs in to the intended GitHub account.
+-2. In the Replit Project Editor, open **Tools → Git**.
+-3. Choose **Connect to GitHub** / the GitHub connection action shown. Complete GitHub's authorization dialog with the intended account/organization. Organization approval may also be required.
+-4. Choose/create **one** repository, for example `Ecoscope`. Prefer private while access and licensing are being reviewed. Do not purchase a plan or add-on. If the interface offers only creation, create the repo there; if linking an existing repo, confirm its history before pushing.
+-5. Confirm this project is linked to that canonical repository. Review staged files, commit and push through the Git pane. Do not force-push or overwrite an existing unrelated history.
+-6. Verify the commit is visible on GitHub. Until that succeeds, GitHub synchronization is **not verified**.
+-
+-For a manually configured remote, use only the real owner/repository selected above:
+-
+-```sh
+-git remote -v
+-# Only when origin is absent; an internal backup remote is not origin.
+-# This is a template, not an executed command:
+-git remote add origin https://github.com/OWNER/REPOSITORY.git
+-git push -u origin HEAD
+-```
+-
+-Authenticate through Replit/GitHub's secure authorization flow, never paste a personal access token into chat or a remote URL. If a remote already exists, review it rather than replacing it. The GitHub API integration for Agent and the Git pane's Git transport authorization are separate capabilities.
+-
+-## Invite 3–5 developers
+-
+-Use **Invite** in the Project Editor header to invite each intended teammate. Use named invitations rather than a broadly shared edit link; verify project access after invitation. Grant edit access needed for coding, not owner/admin rights. For organization/workspace role choices, use the least-privileged member/custom role that permits the work. Available permission controls vary by workspace; don't upgrade merely to obtain a recommended control. Only the lead/owner should manage billing, credentials, publishing and administrative settings.
+-
+-Separately invite the same developers to the canonical GitHub repository using the least-privileged role that can contribute (Write where available, not Admin). Replit access does not automatically prove GitHub access. Never share login credentials.
+-
+-### Roles and ownership
+-
+-| Role | Main responsibility |
+-|---|---|
+-| Lead / integration | Contracts, shared configuration, coordination, reviews, integration and release approval |
+-| Frontend | `artifacts/earthscope/src/`, accessibility and themes |
+-| Backend | `backend/`, validation, source adapters and server-only credentials |
+-| Geospatial | Map integration, CRS/boundaries/spatial QA in coordination with frontend/backend owners |
+-| AI/ML / testing | Statistical validation, evidence grounding, fixtures and regression checks |
+-
+-For **three people**: (1) lead + backend/integration, (2) frontend + geospatial, (3) AI/ML + testing. For four, split geospatial from frontend or backend from lead. For five, assign each role separately.
+-
+-Assign real GitHub handles in `.github/CODEOWNERS.example` before renaming it to `CODEOWNERS`; no identities have been invented. One active owner per file during shared editing. Discuss shared contract/config edits before starting them.
+-
+-## Concurrent editing and review-before-merge
+-
+-- The live Replit project has **one working tree**. Concurrent editors see the same files and branch.
+-- **Never switch, checkout, reset, rebase, stash or pull a different branch while teammates are editing that same working tree.** It changes everyone's files.
+-- Use one agreed integration branch for shared live editing. Do not push shared experimental changes straight to protected `main`.
+-- For independent work/PRs, use separate local clones or isolated workspaces tied to the same canonical GitHub repository. Branch switching is safe only in those independent working trees.
+-- Coordinate a pause before the lead syncs/merges the shared workspace. Inspect uncommitted changes first; never discard someone else's changes.
+-- Require a pull request, at least one teammate's approval, passing Python/API and TypeScript checks, and resolved review comments before merging into `main`.
+-- Enable branch protection/rulesets in GitHub **if available on the existing account/repository plan**: block direct pushes/force pushes and require reviews/checks. If unavailable, enforce the same rules as team policy; do not buy an upgrade.
+-- Commit small scoped changes. Regenerate clients after contract changes. Do not edit generated files manually.
+-- Never commit `.env`, secrets, raw large datasets, local dependency directories or generated screenshots.
+-
+-Reference documentation consulted:
+-- https://docs.replit.com/build/invite-teammates
+-- https://docs.replit.com/features/workspace-tools/git-interface
+-- https://docs.replit.com/features/collaboration/workspaces
+-- https://docs.replit.com/teams/identity-and-access-management/groups-and-permissions
+diff --git a/docs/DEPLOYMENT.md b/docs/DEPLOYMENT.md
+index 02182d2..4172a2f 100644
+--- a/docs/DEPLOYMENT.md
++++ b/docs/DEPLOYMENT.md
+@@ -1,18 +1,16 @@
+ # Publishing runbook — not a deployment claim
+ 
+-Phase 1 establishes a **live development preview**. No public publishing action has been performed by the agent.
++Phase 1 establishes a **live development preview**. No public publishing action has been performed.
+ 
+ 1. Run the checks in `README.md` and review `VERIFICATION.md`.
+ 2. Confirm the committed dependency lockfiles, Python runtime and Node/pnpm dependencies are present.
+ 3. The frontend's artifact definition builds Vite assets; the API definition runs a real Python Uvicorn service. `/` must route to the frontend and `/api` to FastAPI in the same project. `/api/healthz` is the API startup health endpoint.
+-4. Open Replit's **Publishing** tool and review build/run configuration, visibility, location and any cost estimate. Publishing may incur hosting charges; do not approve charges or change plans automatically. The owner chooses whether to proceed.
+-5. Keep all future scientific/database secrets server-side in Replit Secrets. Phase 1 requires none. Never add secrets to `VITE_*` or copy a development connection string into documentation.
+-6. The owner clicks **Publish** only after reviewing the settings. Do not call a preview URL a production URL.
++4. Choose a hosting provider and review build/run configuration, visibility, location and any cost estimate. Hosting may incur charges; do not approve charges or change plans automatically. The owner chooses whether to proceed.
++5. Keep all future scientific/database secrets server-side in the hosting provider's server-side environment variables. Phase 1 requires none. Never add secrets to `VITE_*` or copy a development connection string into documentation.
++6. The owner publishes only after reviewing the settings. Do not call a preview URL a production URL.
+ 7. After publishing, verify the actual published `/`, `/api/healthz`, `/api/foundation`, `/api/series` and `/api/docs`. Check frontend connectivity, static assets, mobile layout and tile-provider access on that actual URL. Publishing itself is not proof these work.
+-8. Record the real production URL from Publishing, deployment time, check outcomes and any rollback decision. No production URL is recorded in Phase 1.
++8. Record the real production URL, deployment time, check outcomes and any rollback decision. No production URL is recorded in Phase 1.
+ 
+ Use a server-capable deployment for FastAPI, not a frontend-only static host. Production commands are separate from Vite's development server. There is no database migration to perform in this phase. Supabase is external and must have its own approved migration process if connected later.
+ 
+ OpenStreetMap's public tile servers are not an unlimited hosting backend. Review https://operations.osmfoundation.org/policies/tiles/ before traffic growth; no prefetching, scraping or offline bulk downloads. Evaluate a permitted free provider or self-hosting only after license/usage review and explicit cost approval when applicable.
+-
+-Reference: https://docs.replit.com/features/publishing/overview
+diff --git a/docs/VERIFICATION.md b/docs/VERIFICATION.md
+index bb4a076..e521c66 100644
+--- a/docs/VERIFICATION.md
++++ b/docs/VERIFICATION.md
+@@ -38,13 +38,13 @@ Playwright results are written under ignored `generated-artifacts/`. Browser che
+ 
+ ## Product rename to Ecoscope — 2026-11-14
+ 
+-- Updated desktop/mobile branding, browser title, description, Open Graph/Twitter metadata, API display names, project documentation and the Replit artifact display title to **Ecoscope**. Preserved the full tagline.
++- Updated desktop/mobile branding, browser title, description, Open Graph/Twitter metadata, API display names, project documentation to **Ecoscope**. Preserved the full tagline.
+ - Kept package names, directory paths, artifact IDs, routes, API field names and workflow identifiers unchanged. The source-specific JSON export has no old product branding and its data format is unchanged.
+ - Reran **54 backend tests**, the full workspace TypeScript check and the frontend production build: passed. Existing deprecation, sourcemap and bundle-size warnings remain non-blocking.
+ - Reran the browser integration suite: **12 groups passed**, no page errors. Added assertions for the exact browser title, product metadata, visible branding and accessible text; also exercised mobile branding and the existing real NASA chart/download flow.
+ - Rechecked all 24 displayed Kampala months against a fresh NASA response; the app retrieval timestamp for this run was **2026-11-14T07:51:40.997547Z**.
+ - Screenshot confirmed the updated visible brand and FastAPI service label. Remaining old-name matches are compatibility identifiers/paths and negative regression assertions, not visible product branding.
+-- Workspace-level project-name editing is a separate Replit UI action: click the app name and change it to **Ecoscope**. Only the artifact display title was changed programmatically. Nothing was published.
++- Nothing was published.
+ 
+ ## Latest increment — NASA POWER monthly T2M, 2026-11-14
+ 
+diff --git a/package.json b/package.json
+index eb4e283..8862b2f 100644
+--- a/package.json
++++ b/package.json
+@@ -9,9 +9,6 @@
+     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
+   },
+   "private": true,
+-  "dependencies": {
+-    "@replit/connectors-sdk": "^0.7.0"
+-  },
+   "devDependencies": {
+     "prettier": "^3.9.10",
+     "typescript": "~5.9.3"
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index 2c4bcf0..b46e709 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -6,15 +6,6 @@ settings:
+ 
+ catalogs:
+   default:
+-    '@replit/vite-plugin-cartographer':
+-      specifier: ^0.5.21
+-      version: 0.5.21
+-    '@replit/vite-plugin-dev-banner':
+-      specifier: ^0.1.1
+-      version: 0.1.2
+-    '@replit/vite-plugin-runtime-error-modal':
+-      specifier: ^0.0.6
+-      version: 0.0.6
+     '@tailwindcss/vite':
+       specifier: ^4.1.14
+       version: 4.3.3
+@@ -161,10 +152,6 @@ overrides:
+ importers:
+ 
+   .:
+-    dependencies:
+-      '@replit/connectors-sdk':
+-        specifier: ^0.7.0
+-        version: 0.7.0
+     devDependencies:
+       prettier:
+         specifier: ^3.9.10
+@@ -311,15 +298,6 @@ importers:
+       '@radix-ui/react-tooltip':
+         specifier: ^1.2.0
+         version: 1.3.0(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+-      '@replit/vite-plugin-cartographer':
+-        specifier: 'catalog:'
+-        version: 0.5.21
+-      '@replit/vite-plugin-dev-banner':
+-        specifier: 'catalog:'
+-        version: 0.1.2
+-      '@replit/vite-plugin-runtime-error-modal':
+-        specifier: 'catalog:'
+-        version: 0.0.6
+       '@tailwindcss/typography':
+         specifier: ^0.5.15
+         version: 0.5.20(tailwindcss@4.3.3)
+@@ -512,12 +490,6 @@ importers:
+       '@radix-ui/react-tooltip':
+         specifier: ^1.3.0
+         version: 1.3.0(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+-      '@replit/vite-plugin-cartographer':
+-        specifier: 'catalog:'
+-        version: 0.5.21
+-      '@replit/vite-plugin-runtime-error-modal':
+-        specifier: 'catalog:'
+-        version: 0.0.6
+       '@tailwindcss/vite':
+         specifier: 'catalog:'
+         version: 4.3.3(vite@7.3.7(@types/node@25.9.9)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.23.15)(yaml@2.9.1))
+@@ -1547,18 +1519,6 @@ packages:
+       react: ^18.0.0
+       react-dom: ^18.0.0
+ 
+-  '@replit/connectors-sdk@0.7.0':
+-    resolution: {integrity: sha512-8AXbiKo5b+0k/x/WjD5O5YIgTGYHx484bydTKLWXDLq6LW3sg0Aq1ClSjp3Mlc91NDpun47TDgIYgFIOKcj0EA==}
+-
+-  '@replit/vite-plugin-cartographer@0.5.21':
+-    resolution: {integrity: sha512-E5rco8Mov05QDfUOjoim3MVJdDX0/pBYql5Jay3w9cqmU/QOL6cEOUAjsBZPB/V8FEChsk++sZUrcWt1bHaAoQ==}
+-
+-  '@replit/vite-plugin-dev-banner@0.1.2':
+-    resolution: {integrity: sha512-YfW3U1xKnLrqvSiTzXeEX8AG+Vpz7XwBsJHNvGbp841AE1mLvishMQi2Zw7ApyHp+9EMGthXuCjP+mLbl3IuGA==}
+-
+-  '@replit/vite-plugin-runtime-error-modal@0.0.6':
+-    resolution: {integrity: sha512-53iuzLsrvcUnWxAo0fvNrUhOf7LYJ+3at61dZeTIrkaZD4vGNjTbvE0j50TFcjjTC9UM74uprlnQ4+L2A//Cjg==}
+-
+   '@rolldown/pluginutils@1.0.0-rc.3':
+     resolution: {integrity: sha512-eybk3TjzzzV97Dlj5c+XrBFW57eTNhzod66y9HrBlzJ6NsCrWCp/2kaPS3K9wJmurBC0Tdw4yPjXKZqlznim3Q==}
+ 
+@@ -2448,9 +2408,6 @@ packages:
+   minimist@1.2.8:
+     resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
+ 
+-  modern-screenshot@4.7.0:
+-    resolution: {integrity: sha512-9YxN+ddPSMMlhylOv25VHzXrl9u67QRxoh7+SEewGtgUw7t6hHTrjptSDJUSne9oG4Xk/h2cwG15nIt4Hc9ujg==}
+-
+   motion-dom@12.43.0:
+     resolution: {integrity: sha512-azKON4d9S65PEoFUiQTMTgPheEmzf2QngdRc50AKfJp9Q9mmcBVw22c8eMq9k8kxOFHdL7+WZY7N/5F/lwiDag==}
+ 
+@@ -4070,24 +4027,6 @@ snapshots:
+       react: 19.1.0
+       react-dom: 19.1.0(react@19.1.0)
+ 
+-  '@replit/connectors-sdk@0.7.0': {}
+-
+-  '@replit/vite-plugin-cartographer@0.5.21':
+-    dependencies:
+-      '@babel/parser': 7.29.9
+-      '@babel/traverse': 7.29.10
+-      '@babel/types': 7.29.8
+-      magic-string: 0.30.21
+-      modern-screenshot: 4.7.0
+-    transitivePeerDependencies:
+-      - supports-color
+-
+-  '@replit/vite-plugin-dev-banner@0.1.2': {}
+-
+-  '@replit/vite-plugin-runtime-error-modal@0.0.6':
+-    dependencies:
+-      '@jridgewell/trace-mapping': 0.3.31
+-
+   '@rolldown/pluginutils@1.0.0-rc.3': {}
+ 
+   '@rollup/rollup-linux-x64-gnu@4.64.5':
+@@ -4864,8 +4803,6 @@ snapshots:
+ 
+   minimist@1.2.8: {}
+ 
+-  modern-screenshot@4.7.0: {}
+-
+   motion-dom@12.43.0:
+     dependencies:
+       motion-utils: 12.39.0
+diff --git a/pnpm-workspace.yaml b/pnpm-workspace.yaml
+index c46efa0..18a24d7 100644
+--- a/pnpm-workspace.yaml
++++ b/pnpm-workspace.yaml
+@@ -16,7 +16,7 @@
+ # passed (e.g. an urgent security bugfix), you can add it to the
+ # `minimumReleaseAgeExclude` allowlist below. Only consider doing this for
+ # packages released by trusted organizations with an impeccable security
+-# posture (e.g. Replit packsges, react from Meta, typescript from Microsoft). Even then,
++# posture (e.g. react from Meta, typescript from Microsoft). Even then,
+ # remove the exclusion once the 1-day window has passed.
+ #
+ # Example:
+@@ -27,12 +27,6 @@
+ # ============================================================================
+ minimumReleaseAge: 1440
+ 
+-minimumReleaseAgeExclude:
+-  # Exclude @replit scoped packages from the minimum release age check.
+-  # These are published by Replit and trusted — the supply-chain attack vector
+-  # this setting guards against does not apply to our own packages.
+-  - '@replit/*'
+-  - stripe-replit-sync
+ 
+ packages:
+   - artifacts/*
+@@ -41,9 +35,6 @@ packages:
+   - scripts
+ 
+ catalog:
+-  '@replit/vite-plugin-cartographer': ^0.5.21
+-  '@replit/vite-plugin-dev-banner': ^0.1.1
+-  '@replit/vite-plugin-runtime-error-modal': ^0.0.6
+   '@tailwindcss/vite': ^4.1.14
+   '@tanstack/react-query': ^5.90.21
+   '@types/node': ^25.3.3
+@@ -79,7 +70,7 @@ overrides:
+   "source-map-js@^1": "^1.2.2"
+   "fast-uri@^3": "^3.1.8"
+   "brace-expansion@^5": "^5.0.12"
+-  # replit uses linux-x64 only, we can exclude all other platforms
++  # only linux-x64 binaries are needed here; other platforms are excluded
+   "esbuild>@esbuild/darwin-arm64": "-"
+   "esbuild>@esbuild/darwin-x64": "-"
+   "esbuild>@esbuild/freebsd-arm64": "-"
+diff --git a/pyproject.toml b/pyproject.toml
+index e38e9a2..e5e6b31 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,9 +1,9 @@
+ [project]
+-name = "repl-nix-workspace"
++name = "ecoscope"
+ version = "0.1.0"
+ description = "Add your description here"
+ authors = [
+-    { name = "iradi2222", email = "67781549-iradi2222@users.noreply.replit.com" }
++    { name = "Arinda Iradi" }
+ ]
+ requires-python = ">=3.12"
+ dependencies = [
+@@ -25,7 +25,7 @@ dependencies = [
+ ]
+ 
+ [project.scripts]
+-repl-nix-workspace = "repl_nix_workspace:main"
++ecoscope = "ecoscope:main"
+ 
+ [build-system]
+ requires = ["uv_build>=0.13.4,<0.14.0"]
+diff --git a/replit.md b/replit.md
+deleted file mode 100644
+index d67c45e..0000000
+--- a/replit.md
++++ /dev/null
+@@ -1,33 +0,0 @@
+-# Ecoscope — Earth System Trend Detective
+-
+-See the Planet. Detect the Trends. Understand the Change.
+-
+-## Scope and scientific integrity
+-- Build incrementally. Phase 1 is the connected environment foundation, not a finished platform.
+-- Never fabricate environmental measurements, statistics, charts, successful connections, tests or causal claims.
+-- NASA POWER monthly T2M point retrieval is the only implemented scientific adapter. Other sources, Supabase/PostGIS, trends, explanations and reports remain pending.
+-- User prefers free external services. Do not upgrade, buy add-ons or provision optional paid services.
+-- Keep all credentials server-side. Foundation and NASA POWER point retrieval require no credentials.
+-
+-## Run and check
+-- Managed `artifacts/api-server: API Server` workflow invokes `pnpm --filter @workspace/api-server run dev`, which starts Python FastAPI via `backend.run`.
+-- Managed `artifacts/earthscope: web` workflow invokes `pnpm --filter @workspace/earthscope run dev`.
+-- API `/api`, dashboard `/`; both use managed `PORT`; frontend also uses `BASE_PATH`.
+-- `uv sync --frozen` installs Python dependencies; `pnpm install --frozen-lockfile` installs JavaScript dependencies.
+-- `uv run python -m pytest backend/tests -q`
+-- `pnpm run typecheck`
+-- `pnpm --filter @workspace/api-spec run codegen` after each contract change.
+-- API docs `/api/docs`; health `/api/healthz`.
+-- NASA contract `/api/power/monthly`; see `docs/NASA_POWER.md` for verified official metadata, bounds, caching, provenance and caveats.
+-- No database required. Unused Express/Drizzle scaffold is not the running backend.
+-
+-## Code and team
+-- Frontend: `artifacts/earthscope/src/`; backend: `backend/`; shared contract: `lib/api-spec/openapi.yaml`.
+-- Python dependency lock: `uv.lock`; JS dependency lock: `pnpm-lock.yaml`.
+-- Keep one shared project and one canonical GitHub repository.
+-- Never switch branches in a working tree teammates are editing concurrently.
+-- Independent PR branches require isolated working trees/clones; review before merge.
+-- GitHub connection and teammate invitations require owner authorization; do not claim them completed without verification.
+-
+-## Documentation
+-- `README.md`, `docs/ARCHITECTURE.md`, `docs/PHASES.md`, `docs/COLLABORATION.md`, `docs/DEPLOYMENT.md`, `docs/VERIFICATION.md`.
+diff --git a/scripts/post-merge.sh b/scripts/post-merge.sh
+deleted file mode 100644
+index ab61c44..0000000
+--- a/scripts/post-merge.sh
++++ /dev/null
+@@ -1,4 +0,0 @@
+-#!/bin/bash
+-set -e
+-pnpm install --frozen-lockfile
+-pnpm --filter db push
+diff --git a/src/ecoscope/__init__.py b/src/ecoscope/__init__.py
+new file mode 100644
+index 0000000..12f685a
+--- /dev/null
++++ b/src/ecoscope/__init__.py
+@@ -0,0 +1,2 @@
++def main() -> None:
++    print("Hello from ecoscope!")
+diff --git a/src/repl_nix_workspace/__init__.py b/src/repl_nix_workspace/__init__.py
+deleted file mode 100644
+index f5e1e84..0000000
+--- a/src/repl_nix_workspace/__init__.py
++++ /dev/null
+@@ -1,2 +0,0 @@
+-def main() -> None:
+-    print("Hello from repl-nix-workspace!")
+diff --git a/uv.lock b/uv.lock
+index 050c7c0..4ae28e4 100644
+--- a/uv.lock
++++ b/uv.lock
+@@ -775,7 +775,7 @@ wheels = [
+ ]
+ 
+ [[package]]
+-name = "repl-nix-workspace"
++name = "ecoscope"
+ version = "0.1.0"
+ source = { editable = "." }
+ dependencies = [
+-- 
+2.43.0
+
