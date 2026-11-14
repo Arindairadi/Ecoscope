@@ -11,7 +11,7 @@ Phase 1 establishes a **live development preview**. No public publishing action 
 7. After publishing, verify the actual published `/`, `/api/healthz`, `/api/foundation`, `/api/series` and `/api/docs`. Check frontend connectivity, static assets, mobile layout and tile-provider access on that actual URL. Publishing itself is not proof these work.
 8. Record the real production URL, deployment time, check outcomes and any rollback decision. No production URL is recorded in Phase 1.
 
-Optional server-side environment variables are listed under Configuration in `README.md` (`FIRMS_MAP_KEY`, `ANTHROPIC_API_KEY`, and usage caps). The app works without any of them.
+Optional server-side environment variables are listed under Configuration in `README.md` (`FIRMS_MAP_KEY`, `AI_PROVIDER`, provider keys/model IDs, and usage caps). For Gemini, set `AI_PROVIDER=gemini`, `GEMINI_API_KEY`, and `GEMINI_MODEL` on the server. The app works without them using rule-based explanations.
 
 Use a server-capable deployment for FastAPI, not a frontend-only static host. Production commands are separate from Vite's development server. There is no database migration to perform in this phase. Supabase is external and must have its own approved migration process if connected later.
 

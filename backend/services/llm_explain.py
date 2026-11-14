@@ -3,7 +3,7 @@
 Safeguards: the model sees only a facts block built from the result; it is told not
 to add numbers or causes; every number in its reply must appear in the facts, or the
 reply is discarded and the deterministic explanation is used instead. Off unless
-ANTHROPIC_API_KEY is set; usage is capped per client and per day.
+the selected provider is configured; usage is capped per client and per day.
 """
 import json
 import os
@@ -44,8 +44,14 @@ class Budget:
 budget = Budget()
 
 
+def provider() -> str:
+    return os.environ.get("AI_PROVIDER", "anthropic").strip().lower()
+
+
 def enabled() -> bool:
-    return bool(os.environ.get("ANTHROPIC_API_KEY"))
+    if provider() == "gemini":
+        return bool(os.environ.get("GEMINI_API_KEY") and os.environ.get("GEMINI_MODEL", "").strip())
+    return provider() == "anthropic" and bool(os.environ.get("ANTHROPIC_API_KEY"))
 
 
 def g(x, nd=4):
@@ -98,6 +104,8 @@ SYSTEM = (
 
 
 async def call_model(facts: dict, question: str, language: str) -> str:
+    if provider() == "gemini":
+        return await call_gemini(facts, question, language)
     payload = {"model": os.environ.get("ANTHROPIC_MODEL", "claude-haiku-5-5"), "max_tokens": 400, "temperature": 0, "system": SYSTEM,
                "messages": [{"role": "user", "content": f"Write in {LANGUAGES[language]}.\n<facts>{json.dumps(facts, ensure_ascii=False)}</facts>\n<question>{question[:500]}</question>"}]}
     headers = {"x-api-key": os.environ["ANTHROPIC_API_KEY"], "anthropic-version": "2023-06-01", "content-type": "application/json"}
@@ -107,6 +115,32 @@ async def call_model(facts: dict, question: str, language: str) -> str:
         return "".join(b.get("text", "") for b in resp.json().get("content", []) if b.get("type") == "text").strip()
 
 
+async def call_gemini(facts: dict, question: str, language: str) -> str:
+    model = os.environ["GEMINI_MODEL"].strip()
+    if not re.fullmatch(r"[A-Za-z0-9._-]+", model):
+        raise ValueError("GEMINI_MODEL must be a model ID, without a URL or models/ prefix")
+    prompt = f"Write in {LANGUAGES[language]}.\n<facts>{json.dumps(facts, ensure_ascii=False)}</facts>\n<question>{question[:500]}</question>"
+    payload = {
+        "systemInstruction": {"parts": [{"text": SYSTEM}]},
+        "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+        "generationConfig": {"temperature": 0, "maxOutputTokens": 2048},
+    }
+    headers = {"x-goog-api-key": os.environ["GEMINI_API_KEY"], "content-type": "application/json"}
+    async with httpx.AsyncClient(timeout=15) as client:
+        resp = await client.post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+            json=payload, headers=headers,
+        )
+        resp.raise_for_status()
+        candidates = resp.json().get("candidates", [])
+        if not candidates or candidates[0].get("finishReason") != "STOP":
+            return ""
+        return "".join(
+            part.get("text", "") for part in candidates[0].get("content", {}).get("parts", [])
+            if not part.get("thought")
+        ).strip()
+
+
 async def explain(r: ResearchResult, question: str, language: str, who: str) -> str | None:
     """Verified AI explanation, or None (caller keeps the deterministic one)."""
     if not enabled() or language not in LANGUAGES or not budget.allow(who):
@@ -114,7 +148,7 @@ async def explain(r: ResearchResult, question: str, language: str, who: str) -> 
     facts = build_facts(r)
     try:
         answer = await call_model(facts, question, language)
-    except (httpx.HTTPError, KeyError, ValueError):
+    except (httpx.HTTPError, KeyError, ValueError, TypeError, AttributeError):
         return None
     if not answer or len(answer) > 2000 or not verified(answer, json.dumps(facts, ensure_ascii=False)):
         return None
